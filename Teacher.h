@@ -37,7 +37,7 @@ struct Teacher {
         cout << "Password: " <<  password << endl;
         cout << "Name: " << firstName << endl;
         cout << "email: " << email << endl;
-        cout << "Classes: " << endl;
+        // cout << "Classes: " << endl;
         // for (int i = 0; i < classes.size(); i++) {
         //     classes[i]->display();
         // }
@@ -45,15 +45,5 @@ struct Teacher {
 
 };
 
-struct CSVRecordTeacher {
-    string id;
-    string username;
-    string password;
-    string name;
-    string email;
-
-    CSVRecordTeacher(string id, string username, string password, string name, string email)
-    : id(id), username(username), password(password), name(name), email(email) {}     
-};
 
 #endif // TEACHER_H

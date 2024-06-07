@@ -47,16 +47,5 @@ struct Class {
     }
 };
 
-struct CSVRecordClass {
-    string id;
-    string name; 
-    // Teacher* teacher; 
-    // vector<Student*> students; 
-    // vector<Assignment*> assignments; 
-
-    CSVRecordClass(string id, string name)
-    : id(id), name(name) {}
-        
-};
 
 #endif // CLASS_H
