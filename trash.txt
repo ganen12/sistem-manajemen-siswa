@@ -1,0 +1,65 @@
+// Struktur data untuk siswa
+struct Student {
+    string id;
+    string username;
+    string password;
+    string name;
+    Class* classPtr;
+
+    Student(string id, string username, string password, string name)
+        : id(id), username(username), password(password), name(name), classPtr(nullptr) {}
+
+    void setClass(Class* cls) {
+        classPtr = cls;
+    }
+
+    Class* getClass() const { 
+        return classPtr;
+    }
+};
+
+// Struktur data untuk guru
+struct Teacher {
+    string id;
+    string username;
+    string password;
+    string name;
+    vector<Class*> classes;
+
+    Teacher(string id, string username, string password, string name)
+        : id(id), username(username), password(password), name(name) {}
+};
+
+// Struktur data untuk kelas
+struct Class {
+    string id;
+    string name;
+    Teacher* teacher;
+    vector<Student*> students;
+
+    Class(string id, string name) : id(id), name(name), teacher(nullptr) {}
+};
+
+// Struktur data untuk tugas
+struct Assignment {
+    string id;
+    string description;
+    string dueDate;
+    Class* classPtr;
+
+    Assignment(string id, string description, string dueDate)
+        : id(id), description(description), dueDate(dueDate), classPtr(nullptr) {}
+};
+
+// Peta untuk menyimpan objek
+unordered_map<string, Student*> studentMap;
+unordered_map<string, Teacher*> teacherMap;
+unordered_map<string, Class*> classMap;
+unordered_map<string, Assignment*> assignmentMap;
+
+// Queue untuk antrian pendaftaran kelas
+queue<Student*> enrollmentQueue;
+
+// Stack untuk undo/redo
+stack<pair<string, Student*>> actionStack;
+stack<pair<string, Student*>> redoStack;

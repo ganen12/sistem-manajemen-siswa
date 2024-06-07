@@ -1,0 +1,57 @@
+ERROR PENTING:
+1. Error karena pendefinisian keseluruhan member objek belum semuanya terpenuhi (pada constructor function tidak ada penetapan untuk
+nilai classPtr) 
+
+Assignment.h: In member function 'void Assignment::display()':
+Assignment.h:23:38: error: invalid use of incomplete type 'struct Class'
+   23 |         cout << "Class: " << classPtr->name << endl;
+      |      
+
+2. Alamat harus ditetapkan terlebih dahulu sebelum nilainya ditetapkan.
+struct StructKedua {
+    int dataKedua;
+    StructPertama *ptrKePertama;
+};
+
+struct StructPertama {
+    int dataPertama;
+    StructKedua *ptrStructKedua; // Pointer ke StructKedua
+};
+
+int main() {
+    // Penggunaan:
+    StructPertama objekPertama;
+    StructKedua objekKedua;
+    objekPertama.ptrStructKedua = &objekKedua; // Menetapkan alamat objekKedua ke pointer
+    objekPertama.ptrStructKedua->dataKedua = 5; // Mengakses data melalui pointer
+    
+
+    int x = objekPertama.ptrStructKedua->dataKedua;
+    cout << 'x' << endl;
+    return 0;
+}
+
+3. Fungsi untuk membaca data dari CSV dan Fungsi untuk menulis data ke CSV
+// void loadStudents(const string& filename);
+// void loadTeachers(const string& filename);
+// void loadClasses(const string& filename);
+// void loadAssignments(const string& filename);
+
+// void saveStudents(const string& filename);
+// void saveTeachers(const string& filename);
+// void saveClasses(const string& filename);
+// void saveAssignments(const string& filename);
+
+4. Shared pointer mungkin tidak digunakan jadi diubah lagi ke:
+struct :     
+        LoggedIn(bool isTeacher, Teacher* teacher = nullptr, Student* student = nullptr) 
+        : isTeacher(isTeacher), teacherPtr(teacher), studentPtr(student) {}
+
+case sign up: 
+      Student newStudent(id, username, password, firstName, lastName, email);
+        
+      STUDENTS_DATA.push_back(newStudent);
+      saveStudentsToCSV(STUDENTS_DATA, "students.csv");
+      Student *foundStudent = &newStudent;
+      LoggedIn loggedin(false, nullptr, foundStudent);
+      loggedin.display();
