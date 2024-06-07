@@ -39,8 +39,22 @@ void saveTeachersToCSV(const vector<Teacher>& data, const string& filename  = "t
              << teacher.password << ","
              << teacher.firstName << ","
              << teacher.lastName << ","
-             << teacher.email << ","
-             << (teacher.classes.empty() ? "NULL" : teacher.classes[vectorSize]->name ) << endl;
+             << teacher.email << ",";
+
+        bool hasClasses = false; // Flag untuk menandai apakah guru mengajar kelas
+        for (int i = 0; i < 6; ++i) {
+            if (teacher.classes[i] != nullptr) {
+                hasClasses = true;
+                file << teacher.classes[i]->name; // Tulis nama kelas jika ada
+                if (i < teacher.numClasses - 1) { // Tambahkan koma jika bukan kelas terakhir
+                    file << ",";
+                }
+            }
+        }
+        if (!hasClasses) {
+            file << "NULL"; // Jika tidak ada kelas yang diajar
+        }
+        file << endl;
     }
 
     file.close(); // Tutup file
@@ -98,7 +112,7 @@ void saveClassesToCSV(const vector<Class>& data, const string& filename = "class
     }
 
     if (includeHeader) {
-        file << "ID,Name,Teacher" << endl; // Header untuk Class
+        file << "ID,Name,Teacher,Assignments" << endl; // Header untuk Class
     }
 
     for (const Class& cls : data) {

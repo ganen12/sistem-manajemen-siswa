@@ -53,7 +53,6 @@ struct LoggedIn {
         this->classId = id;
     }
     
-
     void display() {
         cout << "Currently logged in:" << endl;
         cout << "\t" << (isTeacher ? "Guru" : "Siswa") << endl;
@@ -234,7 +233,7 @@ void teacherClassMenu() {
             Class newClass(id, name, foundTeacher); // Buat kelas dengan guru yang ditemukan
             CLASSES_DATA.push_back(newClass);
 
-            foundTeacher->classes.push_back(&CLASSES_DATA.back());
+            foundTeacher->addClass(&CLASSES_DATA.back());
             saveTeachersToCSV(TEACHERS_DATA, "teachers.csv");
 
             saveClassesToCSV(CLASSES_DATA, "classes.csv");
@@ -262,7 +261,7 @@ void addAssignment() {
         }
     }    
 
-    if (!foundTeacher || foundTeacher->classes.size() == 0) {
+    if (!foundTeacher || foundTeacher->numClasses == 0) {
         cout << "Error: Anda tidak bisa membuat tugas karena Anda tidak memiliki kelas" << endl;
         return;
     }
@@ -276,7 +275,7 @@ void addAssignment() {
     cin >> dueDate;
     cout << "Tugas ini untuk kelas mana? (Pilih nomor)\n-> " << endl; 
 
-    for (size_t i = 0; i < foundTeacher->classes.size(); ++i) {
+    for (int i = 0; i < foundTeacher->numClasses; ++i) {
         cout << i + 1 << ". " << foundTeacher->classes[i]->id << " - " << foundTeacher->classes[i]->name << endl;
     }
     
@@ -284,7 +283,7 @@ void addAssignment() {
     cin >> pilihanKelas;
 
     // Validasi input pilihan kelas
-    if (pilihanKelas < 1 || pilihanKelas > foundTeacher->classes.size()) {
+    if (pilihanKelas < 1 || pilihanKelas > foundTeacher->numClasses) {
         cout << "Pilihan tidak valid." << endl;
         return;
     }
@@ -294,5 +293,9 @@ void addAssignment() {
     Assignment newAssignment(id, description, dueDate, selectedClass);
     ASSIGNMENT_DATA.push_back(newAssignment);
 
+    // Tambahkan assignment ke vektor assignments pada selectedClass
+    selectedClass->assignments.push_back(&ASSIGNMENT_DATA.back()); 
+
     saveAssignmentsToCSV(ASSIGNMENT_DATA, "assignments.csv");
+ saveClassesToCSV(CLASSES_DATA, "classes.csv");
 }

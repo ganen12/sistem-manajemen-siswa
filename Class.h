@@ -10,15 +10,27 @@
 
 using namespace std;
 
+const int MAX_STUDENTS = 36;
+
 struct Class {
     string id;
     string name; // course name
     Teacher* teacher; // pointer to the teacher of this class
-    vector<Student*> students; // pointers to all students enrolled in this class
     vector<Assignment*> assignments; // pointers to all assignments in this class
+    Student* students[MAX_STUDENTS]; // Array untuk menyimpan pointer ke siswa
+    int numStudents = 0;
+
 
     Class(string id, string name, Teacher* teacher = nullptr)
     : id(id), name(name), teacher(teacher), students(), assignments() {}
+
+    void addStudent(Student* s) {
+        if (numStudents < MAX_STUDENTS) {
+            students[numStudents++] = s; // Tambahkan siswa ke array dan increment numStudents
+        } else {
+            cout << "Kapasitas maksimal siswa sudah tercapai." << endl;
+        }
+    }
 
     void display() {
         cout << "Class: " << id << " " << name << endl;
