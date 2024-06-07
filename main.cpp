@@ -21,7 +21,7 @@ struct Pengumpulan;
 #include "Assignment.h"
 #include "Pengumpulan.h"
 
-#include "csv_utils.cpp"
+#include "save_csv_utils.cpp"
 
 using namespace std;
 
@@ -31,12 +31,14 @@ void teacherMenu();
 void teacherClassMenu();
 void mainMenu();
 void addAssignment();
+void assignmentQueue();
 
 
 struct LoggedIn {
     bool isTeacher;
     string id;
     string username;
+    string classId;
 
     LoggedIn(bool isTeacher = false, string id = "", string username = "") 
         : isTeacher(isTeacher), id(id), username(username) {}
@@ -46,6 +48,11 @@ struct LoggedIn {
         this->id = id;
         this->username = username;
     }
+
+    void setClass() {
+        this->classId = id;
+    }
+    
 
     void display() {
         cout << "Currently logged in:" << endl;
@@ -226,6 +233,10 @@ void teacherClassMenu() {
         if (foundTeacher) {
             Class newClass(id, name, foundTeacher); // Buat kelas dengan guru yang ditemukan
             CLASSES_DATA.push_back(newClass);
+
+            foundTeacher->classes.push_back(&CLASSES_DATA.back());
+            saveTeachersToCSV(TEACHERS_DATA, "teachers.csv");
+
             saveClassesToCSV(CLASSES_DATA, "classes.csv");
             cout << "Kelas berhasil dibuat." << endl;
         } else {
@@ -241,17 +252,46 @@ void teacherClassMenu() {
 }
 
 void addAssignment() {
-    string id, description, dueDate;
+    string id, description, dueDate, classId;
+
+    Teacher* foundTeacher = nullptr; // Inisialisasi dengan nullptr
+    for (Teacher& teacher : TEACHERS_DATA) {
+        if (teacher.id == loggedIn.id || teacher.username == loggedIn.username) {
+            foundTeacher = &teacher; // Temukan guru yang sesuai
+            break;
+        }
+    }    
+
+    if (!foundTeacher || foundTeacher->classes.size() == 0) {
+        cout << "Error: Anda tidak bisa membuat tugas karena Anda tidak memiliki kelas" << endl;
+        return;
+    }
 
     cout << "--- Buat Tugas ---" << endl;
     cout << "Masukkan ID Tugas: ";
     cin >> id;
     cout << "Masukkan Nama/Deskripsi Tugas:\n";
-    cin >> description;
-    cout << "Tanggal tenggat Tugas (dd-mm-yy): ";
+    getline(cin >> ws, description);
+    cout << "Tanggal tenggat Tugas (format: dd-mm-yy): ";
     cin >> dueDate;
+    cout << "Tugas ini untuk kelas mana? (Pilih nomor)\n-> " << endl; 
 
-    Assignment newAssignment(id, description, dueDate);
+    for (size_t i = 0; i < foundTeacher->classes.size(); ++i) {
+        cout << i + 1 << ". " << foundTeacher->classes[i]->id << " - " << foundTeacher->classes[i]->name << endl;
+    }
+    
+    int pilihanKelas;
+    cin >> pilihanKelas;
+
+    // Validasi input pilihan kelas
+    if (pilihanKelas < 1 || pilihanKelas > foundTeacher->classes.size()) {
+        cout << "Pilihan tidak valid." << endl;
+        return;
+    }
+
+    Class* selectedClass = foundTeacher->classes[pilihanKelas - 1];
+
+    Assignment newAssignment(id, description, dueDate, selectedClass);
     ASSIGNMENT_DATA.push_back(newAssignment);
 
     saveAssignmentsToCSV(ASSIGNMENT_DATA, "assignments.csv");
