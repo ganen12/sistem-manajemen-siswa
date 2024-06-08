@@ -24,6 +24,10 @@ struct Class {
     Class(string id, string name, Teacher* teacher = nullptr)
     : id(id), name(name), teacher(teacher), students(), assignments() {}
 
+    void setTeacher(Teacher* teacher) {
+        this->teacher = teacher;
+    }
+
     void addStudent(Student* s) {
         if (numStudents < MAX_STUDENTS) {
             students[numStudents++] = s; // Tambahkan siswa ke array dan increment numStudents

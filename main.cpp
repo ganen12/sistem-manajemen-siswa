@@ -1,5 +1,5 @@
 #include <iostream>
-#include <filesystem>
+// #include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <vector>
@@ -20,8 +20,6 @@ struct Pengumpulan;
 #include "Class.h"
 #include "Assignment.h"
 #include "Pengumpulan.h"
-
-#include "save_csv_utils.cpp"
 
 using namespace std;
 
@@ -78,188 +76,7 @@ vector<Class> CLASSES_DATA;
 vector<Assignment> ASSIGNMENT_DATA;
 vector<Pengumpulan> PENGUMPULAN_DATA;
 
-void loadTeachersFromCSV(const string& filename = "teachers.csv", bool hasHeader = true) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        cerr << "Error: Tidak dapat membuka file " << filename << endl;
-        return;
-    }
-
-    string line;
-    if (hasHeader) {
-        getline(file, line); // Lewati baris header
-    }
-
-    while (getline(file, line)) {
-        stringstream ss(line);
-        string id, username, password, firstName, lastName, email;
-        getline(ss, id, ',');
-        getline(ss, username, ',');
-        getline(ss, password, ',');
-        getline(ss, firstName, ',');
-        getline(ss, lastName, ',');
-        getline(ss, email);
-
-        TEACHERS_DATA.push_back(Teacher(id, username, password, firstName, lastName, email));
-    }
-
-    file.close();
-}
-
-void loadClassesFromCSV(const string& filename = "classes.csv", bool hasHeader = true) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        cerr << "Error: Tidak dapat membuka file " << filename << endl;
-        return;
-    }
-
-    string line;
-    if (hasHeader) {
-        getline(file, line); 
-    }
-
-    while (getline(file, line)) {
-        stringstream ss(line);
-        string id, name, teacherId;
-        getline(ss, id, ',');
-        getline(ss, name, ',');
-        getline(ss, teacherId); // tidak ada koma di akhir baris
-        
-        Teacher* teacherPtr = nullptr;
-        for (Teacher& teacher : TEACHERS_DATA) {
-            if (teacher.id == teacherId) {
-                teacherPtr = &teacher;
-                break;
-            }
-        }
-
-        Class newClass(id, name, teacherPtr);
-        CLASSES_DATA.push_back(newClass);
-        if (teacherPtr) {
-            teacherPtr->addClass(&newClass); // Tambahkan kelas ke guru
-        }
-
-    }
-
-    file.close();
-}
-
-void loadStudentsFromCSV(const string& filename = "students.csv", bool hasHeader = true) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        cerr << "Error: Tidak dapat membuka file " << filename << endl;
-        return;
-    }
-
-    string line;
-    if (hasHeader) {
-        getline(file, line); // Lewati baris header
-    }
-
-    while (getline(file, line)) {
-        stringstream ss(line);
-        string id, username, password, firstName, lastName, email, classId;
-        getline(ss, id, ',');
-        getline(ss, username, ',');
-        getline(ss, password, ',');
-        getline(ss, firstName, ',');
-        getline(ss, lastName, ',');
-        getline(ss, email, ',');
-        getline(ss, classId); // Baca ID kelas
-
-        // Cari pointer ke objek Class berdasarkan classId
-        Class* classPtr = nullptr;
-        for (Class& cls : CLASSES_DATA) {
-            if (cls.id == classId) {
-                classPtr = &cls;
-                break;
-            }
-        }
-
-        STUDENTS_DATA.push_back(Student(id, username, password, firstName, lastName, email));
-        if (classPtr) {
-            classPtr->addStudent(&STUDENTS_DATA.back()); // Tambahkan siswa ke kelas
-        }
-    }
-
-    file.close();
-}
-
-void loadAssignmentsFromCSV(const string& filename = "assignments.csv", bool hasHeader = true) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        cerr << "Error: Tidak dapat membuka file " << filename << endl;
-        return;
-    }
-
-    string line;
-    if (hasHeader) {
-        getline(file, line); // Lewati baris header
-    }
-
-    while (getline(file, line)) {
-        stringstream ss(line);
-        string id, description, dueDate, classId;
-        getline(ss, id, ',');
-        getline(ss, description, ',');
-        getline(ss, dueDate, ',');
-        getline(ss, classId); // tidak ada koma di akhir baris
-
-        // Cari pointer ke objek Class berdasarkan classId (perlu diimplementasikan)
-        Class* classPtr = nullptr;
-        for (Class& cls : CLASSES_DATA) {
-            if (cls.id == classId) {
-                classPtr = &cls;
-                break;
-            }
-        }
-
-        ASSIGNMENT_DATA.push_back(Assignment(id, description, dueDate, classPtr));
-    }
-
-    file.close();
-}
-
-void buildRelationships() {
-    // Hubungkan Student dengan Class
-    for (Student& student : STUDENTS_DATA) {
-        for (Class& cls : CLASSES_DATA) {
-            if (cls.id == student.classPtr->id) {
-                student.setClass(&cls);
-                cls.addStudent(&student);
-                break; // Asumsikan seorang siswa hanya bisa berada dalam satu kelas
-            }
-        }
-    }
-
-    // Hubungkan Class dengan Teacher
-    for (Class& cls : CLASSES_DATA) {
-        for (Teacher& teacher : TEACHERS_DATA) {
-            if (teacher.id == cls.teacher->id) {
-                cls.teacher = &teacher;
-                teacher.addClass(&cls);
-                break; // Asumsikan satu kelas hanya memiliki satu guru
-            }
-        }
-    }
-
-    // Hubungkan Assignment dengan Class
-    for (Assignment& assignment : ASSIGNMENT_DATA) {
-        for (Class& cls : CLASSES_DATA) {
-                if (cls.id == assignment.classPtr->id) {
-                assignment.classPtr = &cls;
-                cls.assignments.push_back(&assignment);
-                break;
-            }
-        }
-    }
-}
-
 int main() {
-
-    // loadTeachersFromCSV();
-    // loadClassesFromCSV();
-    // buildRelationships();
 
     while (1) {
     mainMenu();
@@ -316,7 +133,7 @@ void mainMenu() {
         
         TEACHERS_DATA.push_back(newTeacher);
         // TEACHERS_DATA[0].display();
-        saveTeachersToCSV(TEACHERS_DATA, "teachers.csv");
+        // saveTeachersToCSV(TEACHERS_DATA, "teachers.csv");
 
         loggedIn.update(true, id, username);
         loggedIn.display();
@@ -347,7 +164,6 @@ void mainMenu() {
         Student newStudent(id, username, password, firstName, lastName, email);
         
         STUDENTS_DATA.push_back(newStudent);
-        saveStudentsToCSV(STUDENTS_DATA, "students.csv");
 
         loggedIn.update(false, STUDENTS_DATA.back().id, STUDENTS_DATA.back().username);    
         // loggedin.display();
@@ -423,13 +239,19 @@ void teacherClassMenu() {
         }
         cout << "CHECKPOINT1" << endl;
         if (foundTeacher) {
-            Class newClass(id, name, foundTeacher); // Buat kelas dengan guru yang ditemukan
+            Class newClass(id, name); // Buat kelas dengan guru yang ditemukan
             CLASSES_DATA.push_back(newClass);
+            CLASSES_DATA.back().setTeacher(foundTeacher);
     
-            foundTeacher->addClass(&CLASSES_DATA.back());
-            saveTeachersToCSV(TEACHERS_DATA, "teachers.csv");
+            // foundTeacher->addClass(&CLASSES_DATA.back());
+            for (size_t i = 0; i < TEACHERS_DATA.size(); i++) {
+                if (TEACHERS_DATA[i].id == loggedIn.id || TEACHERS_DATA[i].username == loggedIn.username) {
+                    TEACHERS_DATA[i].addClass(&CLASSES_DATA.back());
+                }
+                
+            }
 
-            saveClassesToCSV(CLASSES_DATA, "classes.csv");
+            cout << "CHECKPOINT2" << endl;
             cout << "Kelas berhasil dibuat." << endl;
 
             loggedIn.update(true, foundTeacher->id, foundTeacher->username);
@@ -491,6 +313,5 @@ void addAssignment() {
     // Tambahkan assignment ke vektor assignments pada selectedClass
     selectedClass->assignments.push_back(&ASSIGNMENT_DATA.back()); 
 
-    saveAssignmentsToCSV(ASSIGNMENT_DATA, "assignments.csv");
-    saveClassesToCSV(CLASSES_DATA, "classes.csv");
+    // saveClassesToCSV(CLASSES_DATA, "classes.csv");
 }
