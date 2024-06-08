@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include "Class.h"
+#include <array> 
 
 using namespace std;
 
@@ -20,12 +21,11 @@ struct Teacher {
     int numClasses = 0;
 
 
-    Teacher(string id, string username, string password, string firstName, string lastName, string email)
-        : id(id), username(username), password(password), firstName(firstName), lastName(lastName), email(email), classes() {}
 
     void addClass(Class* cls) {
         if (numClasses < MAX_CLASSES) {
-            classes[numClasses++] = cls; // Tambahkan kelas ke array dan increment numClasses
+            this->classes[numClasses] = cls; // Tambahkan kelas ke array dan increment numClasses
+            numClasses++; // Increment numClasses
         } else {
             cout << "Maksimal kelas yang bisa diajar sudah tercapai." << endl;
         }
@@ -37,10 +37,15 @@ struct Teacher {
         cout << "Password: " <<  password << endl;
         cout << "Name: " << firstName << endl;
         cout << "email: " << email << endl;
-        // cout << "Classes: " << endl;
-        // for (int i = 0; i < classes.size(); i++) {
-        //     classes[i]->display();
-        // }
+        cout << "Classes: " << endl;
+        for ( Class* cls : classes ) {
+            if (cls!= nullptr) {
+                cout << cls->name << endl;
+            } else {
+                cout << "Tidak ada kelas" << endl;
+            }
+        }
+        
     }
 
 };

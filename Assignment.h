@@ -13,9 +13,15 @@ struct Assignment {
     string dueDate;
     Class* classPtr; // pointer to the class this assignment belongs to
 
-    Assignment(string id, string description, string dueDate, Class* classPtr = nullptr)
-        : id(id), description(description), dueDate(dueDate), classPtr(classPtr) {}
+    // Assignment(string id, string description, string dueDate, Class* classPtr = nullptr)
+    //     : id(id), description(description), dueDate(dueDate), classPtr(classPtr) {}
 
+    void initialize(string id, string description, string dueDate, Class* classPtr = nullptr) {
+        id = id;
+        description = description;
+        dueDate = dueDate;
+        classPtr = classPtr;
+    }
     void display() {
         cout << "Assignment ID: " << id << endl;
         cout << "Description: " << description << endl;

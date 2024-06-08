@@ -6,7 +6,7 @@
 #include <vector>
 #include "Assignment.h"
 #include "Student.h"
-#include "Teacher.h"
+
 
 using namespace std;
 
@@ -20,9 +20,14 @@ struct Class {
     Student* students[MAX_STUDENTS]; // Array untuk menyimpan pointer ke siswa
     int numStudents = 0;
 
+    // Class(string id, string name, Teacher* teacher = nullptr)
+    // : id(id), name(name), teacher(teacher), students(), assignments() {}
 
-    Class(string id, string name, Teacher* teacher = nullptr)
-    : id(id), name(name), teacher(teacher), students(), assignments() {}
+    void initialize(string id, string name, Teacher* teacher = nullptr) {
+        id = id;
+        name = name;
+        teacher = teacher;
+    }
 
     void setTeacher(Teacher* teacher) {
         this->teacher = teacher;
@@ -38,7 +43,12 @@ struct Class {
 
     void display() {
         cout << "Class: " << id << " " << name << endl;
-        cout << "Teacher: " << teacher->id << " " << teacher->username << endl;
+        if (teacher != nullptr) {
+            // cout << "Teacher: " << teacher->id << " " << teacher->username << endl;
+        } else {
+            cout << "Teacher: Tidak ada" << endl;
+        }
+        
         cout << "Students: " << endl;
         // for (Student* student : students) {
         //     cout << "    " << student->id << " " << student->name << endl;

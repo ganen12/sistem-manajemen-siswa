@@ -17,8 +17,8 @@ struct Student {
     float Ipk;
     Class* classPtr; // pointer to the class the student is enrolled in
 
-    Student(string id, string username, string password, string firstName, string lastName, string email, Class* classPtr = nullptr)
-    : id(id), username(username), password(password), firstName(firstName), lastName(lastName), email(email), classPtr(classPtr), Ipk() {}   
+    // Student(string id, string username, string password, string firstName, string lastName, string email, Class* classPtr = nullptr)
+    // : id(id), username(username), password(password), firstName(firstName), lastName(lastName), email(email), classPtr(classPtr), Ipk() {}   
 
     void setClass(Class* cls) {
         classPtr = cls;
