@@ -34,7 +34,7 @@ struct Class {
 
     void display() {
         cout << "Class: " << id << " " << name << endl;
-        // cout << "Teacher: " << teacher->id << " " << teacher->name << endl;
+        cout << "Teacher: " << teacher->id << " " << teacher->username << endl;
         cout << "Students: " << endl;
         // for (Student* student : students) {
         //     cout << "    " << student->id << " " << student->name << endl;
@@ -43,7 +43,6 @@ struct Class {
         // for (Assignment* assignment : assignments) {
         //     cout << "    " << assignment->id << " " << assignment->description  << endl;
         // }
-        cout << endl;
     }
 };
 

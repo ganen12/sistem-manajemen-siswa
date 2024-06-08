@@ -42,10 +42,10 @@ void saveTeachersToCSV(const vector<Teacher>& data, const string& filename  = "t
              << teacher.email << ",";
 
         bool hasClasses = false; // Flag untuk menandai apakah guru mengajar kelas
-        for (int i = 0; i < 6; ++i) {
+        for (int i = 0; i < teacher.numClasses; ++i) {
             if (teacher.classes[i] != nullptr) {
                 hasClasses = true;
-                file << teacher.classes[i]->name; // Tulis nama kelas jika ada
+                file << teacher.classes[i]->id; // Tulis nama kelas jika ada
                 if (i < teacher.numClasses - 1) { // Tambahkan koma jika bukan kelas terakhir
                     file << ",";
                 }
@@ -88,7 +88,7 @@ void saveStudentsToCSV(const vector<Student>& data, const string& filename = "st
              << student.firstName << ","
              << student.lastName << ","
              << student.email << ","
-             << (student.classPtr ? student.classPtr->name : "NULL") << endl; 
+             << (student.classPtr ? student.classPtr->id : "NULL") << endl; 
     }
 
     file.close();
@@ -118,7 +118,7 @@ void saveClassesToCSV(const vector<Class>& data, const string& filename = "class
     for (const Class& cls : data) {
         file << cls.id << ","
              << cls.name << ","
-             << (cls.teacher ? cls.teacher->username : "NULL") << endl; // Ambil ID guru jika ada, atau NULL
+             << (cls.teacher ? cls.teacher->id : "NULL") << endl; // Ambil ID guru jika ada, atau NULL
     }
 
     file.close();
