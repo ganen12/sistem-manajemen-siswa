@@ -24,8 +24,8 @@ struct Assignment {
     }
     void display() {
         cout << "Assignment ID: " << id << endl;
-        cout << "Description: " << description << endl;
-        cout << "Due Date: " << dueDate << endl;
+        cout << "Deskripsi: " << description << endl;
+        cout << "Tanggal Tenggat: " << dueDate << endl;
         // cout << "Class: " << classPtr->name << endl;
         cout << endl;
     }

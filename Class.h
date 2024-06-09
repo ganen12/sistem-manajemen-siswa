@@ -35,7 +35,8 @@ struct Class {
 
     void addStudent(Student* s) {
         if (numStudents < MAX_STUDENTS) {
-            students[numStudents++] = s; // Tambahkan siswa ke array dan increment numStudents
+            this->students[numStudents] = s; // Tambahkan siswa ke array dan increment numStudents
+            numStudents++;
         } else {
             cout << "Kapasitas maksimal siswa sudah tercapai." << endl;
         }

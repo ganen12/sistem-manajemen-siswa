@@ -8,9 +8,10 @@
 using namespace std;
 
 struct Pengumpulan {
-    int tugasId;
+    string tugasId;
     string description;
     string studentId;
+    string studentName;
     time_t timestamp;
 };
 

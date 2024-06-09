@@ -20,8 +20,8 @@ struct Student {
     // Student(string id, string username, string password, string firstName, string lastName, string email, Class* classPtr = nullptr)
     // : id(id), username(username), password(password), firstName(firstName), lastName(lastName), email(email), classPtr(classPtr), Ipk() {}   
 
-    void setClass(Class* cls) {
-        classPtr = cls;
+    void addClass(Class* cls) {
+        this->classPtr = cls;
     }
 
     Class* getClass() const { 

@@ -20,8 +20,6 @@ struct Teacher {
     Class* classes[MAX_CLASSES]; // Array untuk menyimpan pointer ke kelas
     int numClasses = 0;
 
-
-
     void addClass(Class* cls) {
         if (numClasses < MAX_CLASSES) {
             this->classes[numClasses] = cls; // Tambahkan kelas ke array dan increment numClasses
