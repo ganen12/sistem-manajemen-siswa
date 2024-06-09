@@ -23,8 +23,6 @@ struct Pengumpulan;
 
 using namespace std;
 
-const int MAX_STUDENTS_IN_CLASS = 30;
-
 void teacherMenu();
 void studentMenu();
 void teacherClassMenu();
@@ -37,19 +35,18 @@ struct LoggedIn {
     bool isTeacher;
     string id;
     string username;
-    string classId;
+    Teacher* teacherPtr;
+    Student* studentPtr;
 
-    LoggedIn(bool isTeacher = false, string id = "", string username = "") 
-        : isTeacher(isTeacher), id(id), username(username) {}
+    LoggedIn(bool isTeacher = false, string id = "", string username = "", Teacher* teacherPtr = nullptr, Student* studentPtr = nullptr) 
+        : isTeacher(isTeacher), id(id), username(username), teacherPtr(teacherPtr), studentPtr(studentPtr) {}
 
-    void update(bool isTeacher, string id, string username) {
+    void update(bool isTeacher, string id, string username, Teacher* teacher = nullptr, Student* student = nullptr) {
         this->isTeacher = isTeacher;
         this->id = id;
         this->username = username;
-    }
-
-    void setClass() {
-        this->classId = id;
+        this->teacherPtr = teacher;
+        this->studentPtr = student;
     }
     
     void display() {
@@ -70,12 +67,6 @@ struct LoggedIn {
 
 LoggedIn loggedIn;
 
-// menyimpan semua data dari file-file csv pada saat program dijalankan
-// vector<Student> STUDENTS_DATA; 
-// vector<Teacher> TEACHERS_DATA;
-// vector<Class> CLASSES_DATA;
-// vector<Assignment> ASSIGNMENT_DATA;
-// vector<Pengumpulan> PENGUMPULAN_DATA;
 int s = 0;
 int t = 0;
 int c = 0;
@@ -106,6 +97,7 @@ int main() {
 }
 
 void mainMenu() {
+
     int option;
     string in, passIn;
     string id, username, password, firstName, lastName, email;
@@ -129,7 +121,7 @@ void mainMenu() {
         bool loginSuccess = false;
         for (int i = 0; i < t; i++) {
             if ((TEACHERS_DATA[i].username == in || TEACHERS_DATA[i].email == in) && TEACHERS_DATA[i].password == passIn) {
-                loggedIn.update(true, TEACHERS_DATA[i].id, TEACHERS_DATA[i].username);
+                loggedIn.update(true, TEACHERS_DATA[i].id, TEACHERS_DATA[i].username, &TEACHERS_DATA[i]);
                 loggedIn.display();
                 loginSuccess = true;                
                 teacherMenu();
@@ -150,7 +142,7 @@ void mainMenu() {
         bool loginSuccess = false;
         for (int i = 0; i < t; i++) {
             if ((STUDENTS_DATA[i].username == in || STUDENTS_DATA[i].email == in) && STUDENTS_DATA[i].password == passIn) {
-                loggedIn.update(false, STUDENTS_DATA[i].id, STUDENTS_DATA[i].username);
+                loggedIn.update(false, STUDENTS_DATA[i].id, STUDENTS_DATA[i].username, nullptr, &STUDENTS_DATA[i]);
                 loggedIn.display();
                 loginSuccess = true;
                 studentMenu();
@@ -185,7 +177,7 @@ void mainMenu() {
         t++;
         // saveTeachersToCSV(TEACHERS_DATA, "teachers.csv");
 
-        loggedIn.update(true, id, username);
+        loggedIn.update(true, id, username, &TEACHERS_DATA[t-1]);
         loggedIn.display();
 
         cout << "TEACHERS_DATA SEKARANG: " << endl;
@@ -223,7 +215,7 @@ void mainMenu() {
         STUDENTS_DATA[s].email = email;
         s++;
 
-        loggedIn.update(false, id, username);    
+        loggedIn.update(false, id, username, nullptr, &STUDENTS_DATA[s-1]);    
         loggedIn.display();
 
         studentMenu();
@@ -241,7 +233,6 @@ void teacherMenu() {
     bool isTeacher = true;
 
     cout << "--- MENU GURU ---" << endl;
-    // cout << "1. Membuatkan akun siswa" << endl;
     cout << "1. Melihat nilai dari kelas" << endl;
     cout << "2. Lihat queue tugas" << endl;
     cout << "3. Menambah tugas" << endl;
@@ -283,19 +274,19 @@ void studentMenu() {
     
     switch (option) {
     case 1: {
-        Student* foundStudent = nullptr; // Inisialisasi dengan nullptr
+        Student* foundStudent = loggedIn.studentPtr; // Inisialisasi dengan nullptr
         // for (Student& student : STUDENTS_DATA) {
         //     if (student.id == loggedIn.id || student.username == loggedIn.username) {
         //         foundStudent = &student; // Temukan siswa yang sesuai
         //         break;
         //     }
         // }  
-        for (int i = 0; i < s; i++) {
-            if (STUDENTS_DATA[i].id == loggedIn.id || STUDENTS_DATA[i].username == loggedIn.username) {
-                foundStudent = &STUDENTS_DATA[i]; // Temukan siswa yang sesuai
-                break;
-            }            
-        }
+        // for (int i = 0; i < s; i++) {
+        //     if (STUDENTS_DATA[i].id == loggedIn.id || STUDENTS_DATA[i].username == loggedIn.username) {
+        //         foundStudent = &STUDENTS_DATA[i]; // Temukan siswa yang sesuai
+        //         break;
+        //     }            
+        // }
         
         if (foundStudent->classPtr != nullptr) {
             int opt;
@@ -311,6 +302,7 @@ void studentMenu() {
             case 1: {
                 for (Assignment* ass : foundStudent->classPtr->assignments) {
                     ass->display();
+                    ass->classPtr->name;
                     break;
                 }
             }
@@ -337,7 +329,6 @@ void teacherClassMenu() {
     string id, name, teacher;
 
     cout << "--- MANAJEMEN KELAS ---" << endl;
-    // cout << "1. Membuatkan akun siswa" << endl;
     cout << "1. Membuat kelas" << endl;
     cout << "2. Mengedit kelas" << endl;
     cout << "3. Menghapus kelas" << endl;
@@ -353,13 +344,13 @@ void teacherClassMenu() {
         cout << "Masukkan Nama kelas: ";
         cin >> name;
 
-        Teacher* foundTeacher = nullptr; // Inisialisasi dengan nullptr
-        for (Teacher& teacher : TEACHERS_DATA) {
-            if (teacher.id == loggedIn.id || teacher.username == loggedIn.username) {
-                foundTeacher = &teacher; // Temukan guru yang sesuai
-                break;
-            }
-        }
+        Teacher* foundTeacher = loggedIn.teacherPtr; // Inisialisasi dengan nullptr
+        // for (Teacher& teacher : TEACHERS_DATA) {
+        //     if (teacher.id == loggedIn.id || teacher.username == loggedIn.username) {
+        //         foundTeacher = &teacher; // Temukan guru yang sesuai
+        //         break;
+        //     }
+        // }
 
         if (foundTeacher) {
             // Class newClass(id, name); // Buat kelas dengan guru yang ditemukan
@@ -367,14 +358,6 @@ void teacherClassMenu() {
             CLASSES_DATA[c].name = name;
             CLASSES_DATA[c].setTeacher(foundTeacher);
             c++;
-
-            // for (Class& c : CLASSES_DATA) {
-            //     if (c.id == id || c.name == name) {
-            //         c.setTeacher(foundTeacher);
-            //         break;
-            //     }   
-            // }
-            // CLASSES_DATA.back().setTeacher(foundTeacher);
     
             foundTeacher->addClass(&CLASSES_DATA[c-1]);
             // for (size_t i = 0; i < 200; i++) {
@@ -384,10 +367,9 @@ void teacherClassMenu() {
             //     }
                 
             // }
-
             cout << "Kelas berhasil dibuat." << endl;
 
-            loggedIn.update(true, foundTeacher->id, foundTeacher->username);
+            loggedIn.update(true, foundTeacher->id, foundTeacher->username, foundTeacher);
         } else {
             cout << "Error: Guru yang sedang login tidak ditemukan." << endl;
         }        
@@ -403,13 +385,13 @@ void teacherClassMenu() {
 void addAssignment() {
     string id, description, dueDate, classId;
 
-    Teacher* foundTeacher = nullptr; // Inisialisasi dengan nullptr
-    for (Teacher& teacher : TEACHERS_DATA) {
-        if (teacher.id == loggedIn.id || teacher.username == loggedIn.username) {
-            foundTeacher = &teacher; // Temukan guru yang sesuai
-            break;
-        }
-    }    
+    Teacher* foundTeacher = loggedIn.teacherPtr; // Inisialisasi dengan nullptr
+    // for (Teacher& teacher : TEACHERS_DATA) {
+    //     if (teacher.id == loggedIn.id || teacher.username == loggedIn.username) {
+    //         foundTeacher = &teacher; // Temukan guru yang sesuai
+    //         break;
+    //     }
+    // }    
 
     if (!foundTeacher || foundTeacher->numClasses == 0) {
         cout << "Error: Anda tidak bisa membuat tugas karena Anda tidak memiliki kelas" << endl;
@@ -449,6 +431,6 @@ void addAssignment() {
     // Tambahkan assignment ke vektor assignments pada selectedClass
     selectedClass->assignments.push_back(&ASSIGNMENT_DATA[a-1]); 
 
-    cout << "Berhasil menambahkan tugas" << endl;
+    cout << "Tugas berhasil ditambahkan oleh " << ASSIGNMENT_DATA[a-1].classPtr->teacher->username << endl;
     // saveClassesToCSV(CLASSES_DATA, "classes.csv");
 }
