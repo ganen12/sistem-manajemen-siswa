@@ -96,15 +96,15 @@ int main() {
     while (1) {
         loggedIn.update(false, "", "", nullptr, nullptr);
         mainMenu();
-        cout << "Data Kelas di CLASSES_DATA:" << endl;
+        // cout << "Data Kelas di CLASSES_DATA:" << endl;
 
-        for (int i = 0; i < c; i++) {
-            cout << "Nama kelas: " << CLASSES_DATA[i].name << " - " << CLASSES_DATA[i].id << endl;
-            cout << "Oleh "<< CLASSES_DATA[i].teacher->username << endl;
-            cout << "Jumlah siswa: " << CLASSES_DATA[i].numStudents << endl;
-            cout << "Assignments: " << CLASSES_DATA[i].assignments.size() << endl;
-        }
-        cout << endl;
+        // for (int i = 0; i < c; i++) {
+        //     cout << "Nama kelas: " << CLASSES_DATA[i].name << " - " << CLASSES_DATA[i].id << endl;
+        //     cout << "Oleh "<< CLASSES_DATA[i].teacher->username << endl;
+        //     cout << "Jumlah siswa: " << CLASSES_DATA[i].numStudents << endl;
+        //     cout << "Assignments: " << CLASSES_DATA[i].assignments.size() << endl;
+        // }
+        // cout << endl;
     }
     return 0;
 }
@@ -217,8 +217,6 @@ void mainMenu() {
         cin >> email;
         cout << "Masukkan Kelas: " << endl;
 
-        // Student newStudent(id, username, password, firstName, lastName, email);
-        
         STUDENTS_DATA[s].id = id; // TODO: ubah ID menjadi otomatis dan bukan inputan
         STUDENTS_DATA[s].username = username;
         STUDENTS_DATA[s].password =  password;
@@ -384,8 +382,7 @@ void seeClass() {
             
             if (inputId == "0") break; // TODO: validasi input
 
-            // Pengumpulan newPengumpulan;
-
+            // Buat objek pengumpulan
             PENGUMPULAN_DATA[p].tugasId = inputId;
             PENGUMPULAN_DATA[p].studentId = foundStudent->id;
             PENGUMPULAN_DATA[p].studentName = foundStudent->firstName + " " + foundStudent->lastName;
@@ -541,12 +538,6 @@ void teacherClassMenu() {
         cin >> name;
 
         Teacher* foundTeacher = loggedIn.teacherPtr; // foundTeacher adalah yang sedang login saat ini
-        // for (Teacher& teacher : TEACHERS_DATA) {
-        //     if (teacher.id == loggedIn.id || teacher.username == loggedIn.username) {
-        //         foundTeacher = &teacher; // Temukan guru yang sesuai
-        //         break;
-        //     }
-        // }
 
         if (foundTeacher) {
             // Class newClass(id, name); // Buat kelas dengan guru yang ditemukan
@@ -576,12 +567,6 @@ void addAssignment() {
     string id, description, dueDate, classId;
 
     Teacher* foundTeacher = loggedIn.teacherPtr; // Inisialisasi dengan nullptr
-    // for (Teacher& teacher : TEACHERS_DATA) {
-    //     if (teacher.id == loggedIn.id || teacher.username == loggedIn.username) {
-    //         foundTeacher = &teacher; // Temukan guru yang sesuai
-    //         break;
-    //     }
-    // }    
     if (loggedIn.studentPtr) {
         cout << "Anda tidak berhak menambahkan tugas" << endl;
         return;
@@ -614,7 +599,6 @@ void addAssignment() {
 
     Class* selectedClass = foundTeacher->classes[pilihanKelas - 1];
 
-    // Assignment newAssignment(id, description, dueDate, selectedClass);
     ASSIGNMENT_DATA[a].id = id;
     ASSIGNMENT_DATA[a].description = description;
     ASSIGNMENT_DATA[a].dueDate = dueDate;
