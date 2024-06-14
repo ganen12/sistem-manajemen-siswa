@@ -22,6 +22,9 @@ struct Queue;
 #include "Assignment.h"
 #include "Pengumpulan.h"
 #include "Queue.cpp"
+#include "InsertionSort.h"
+#include "DisplayData.h"
+#include "SequentialSearch.h"
 
 using namespace std;
 
@@ -35,28 +38,24 @@ void seeClass();
 void joinClass();
 
 // TODO
-void displayTeachersData(bool sort = false, string sortBy = "alphabetical"); // display teachers_data dengan algoritma sorting
-void displayStudentsData(bool sort = false, string sortBy = "alphabetical"); // display students_data dari kelas yang diajar guru yang sedang login
-void displayClassesData(bool sort = false, string sortBy = "alphabetical"); // display kelas
-void displayAssignmentsData(bool sort = false, string sortBy = "alphabetical"); // display assignment dari kelas tertentu
+void displayTeachersData(bool sort, string sortBy, bool showAll); // display teachers_data dengan algoritma sorting
+void displayStudentsData(bool sort, string sortBy, bool showAll); // display students_data dari kelas yang diajar guru yang sedang login
+void displayClassesData(bool sort, string sortBy, bool showAll); // display kelas
+void displayAssignmentsData(bool sort, string sortBy, bool showAll); // display assignment dari kelas tertentu
 
 void searchTeacherInfo(string search, string searchBy = "username");
 void searchStudentInfo(string search, string searchBy = "username");
 
 struct LoggedIn {
     bool isTeacher;
-    string id;
-    string username;
     Teacher* teacherPtr;
     Student* studentPtr;
 
-    LoggedIn(bool isTeacher = false, string id = "", string username = "", Teacher* teacherPtr = nullptr, Student* studentPtr = nullptr) 
-        : isTeacher(isTeacher), id(id), username(username), teacherPtr(teacherPtr), studentPtr(studentPtr) {}
+    LoggedIn(bool isTeacher = false, Teacher* teacherPtr = nullptr, Student* studentPtr = nullptr) 
+        : isTeacher(isTeacher), teacherPtr(teacherPtr), studentPtr(studentPtr) {}
 
-    void update(bool isTeacher, string id, string username, Teacher* teacher = nullptr, Student* student = nullptr) {
+    void update(bool isTeacher, Teacher* teacher = nullptr, Student* student = nullptr) {
         this->isTeacher = isTeacher;
-        this->id = id;
-        this->username = username;
         this->teacherPtr = teacher;
         this->studentPtr = student;
     }
@@ -66,11 +65,11 @@ struct LoggedIn {
         cout << "\t" << (isTeacher ? "Guru" : "Siswa") << endl;
 
         if (isTeacher) {
-            cout << "\tID: " << id << endl;
-            cout << "\tUSERNAME: " << username << endl;
+            cout << "\tID: " << teacherPtr->id << endl;
+            cout << "\tUSERNAME: " << teacherPtr->id << endl;
         } else if (!isTeacher) {
-            cout << "\tID: " << id << endl;
-            cout << "\tUSERNAME: " << username << endl;
+            cout << "\tID: " << studentPtr->id << endl;
+            cout << "\tUSERNAME: " << studentPtr->username << endl;
         } else {
             cout << "\tInformasi pengguna tidak ditemukan." << endl;
         }
@@ -79,6 +78,7 @@ struct LoggedIn {
 
 LoggedIn loggedIn;
 Queue tugasQueue;
+const int MAX_DATA = 200;
 
 int s = 0;
 int t = 0;
@@ -86,16 +86,17 @@ int c = 0;
 int a = 0;
 int p = 0;
 
-Student STUDENTS_DATA[200]; 
-Teacher TEACHERS_DATA[200];
-Class CLASSES_DATA[200];
-Assignment ASSIGNMENT_DATA[200];
-Pengumpulan PENGUMPULAN_DATA[200];
+Student STUDENTS_DATA[MAX_DATA]; 
+Teacher TEACHERS_DATA[MAX_DATA];
+Class CLASSES_DATA[MAX_DATA];
+Assignment ASSIGNMENT_DATA[MAX_DATA];
+Pengumpulan PENGUMPULAN_DATA[MAX_DATA];
 
 int main() {
     while (1) {
-        loggedIn.update(false, "", "", nullptr, nullptr);
+        loggedIn.update(false, nullptr, nullptr);
         mainMenu();
+        // displayClassesData(false, "alphabetical", true);
         // cout << "Data Kelas di CLASSES_DATA:" << endl;
 
         // for (int i = 0; i < c; i++) {
@@ -107,6 +108,137 @@ int main() {
         // cout << endl;
     }
     return 0;
+}
+
+void displayClassesData(bool sort = false, string sortBy = "alphabetical", bool showAll = false) {
+    // Salin data kelas untuk menghindari modifikasi data asli
+    Class tempClasses[MAX_DATA];
+    copy(CLASSES_DATA, CLASSES_DATA + c, tempClasses);
+
+    // Urutkan data jika diminta
+    if (sort) {
+        if (sortBy == "alphabetical") {
+            classInsertionSort(tempClasses, c, sortBy, [](const Class& a, const Class& b) {
+                return a.name < b.name;
+            });
+        } else if (sortBy == "id") {
+            classInsertionSort(tempClasses, c, sortBy, [](const Class& a, const Class& b) {
+                return a.id < b.id;
+            });
+        } else if (sortBy == "teacher") {
+            classInsertionSort(tempClasses, c, sortBy, [](const Class& a, const Class& b) {
+                return a.teacher->username < b.teacher->username;
+            });            
+        }// TODO: Tambahkan opsi pengurutan lain jika diperlukan
+    }
+
+    cout << "\n--- Daftar Kelas ---" << endl;
+
+    // Tampilkan header tabel
+    cout << "ID\tNama\tGuru\tSiswa\tTugas" << endl;
+    cout << "----------------------------------------------" << endl;
+
+    for (int i = 0; i < c; i++) {
+        Class& cls = tempClasses[i];
+
+        // Filter kelas berdasarkan guru yang sedang login jika showAll = false
+        if (!showAll && loggedIn.isTeacher && cls.teacher != loggedIn.teacherPtr) {
+            continue;
+        }
+
+        cout << cls.id << "\t" << cls.name << "\t";
+
+        // Tampilkan nama guru jika ada
+        if (cls.teacher) {
+            cout << cls.teacher->username;
+        } else {
+            cout << "-"; // atau "NULL"
+        }
+        cout << "\t";
+
+        // Tampilkan jumlah siswa
+        cout << cls.numStudents << "\t";
+
+        // Tampilkan jumlah tugas
+        cout << cls.assignments.size() << endl;
+    }    
+}
+
+void displayStudentsData(bool sort = false, string sortBy = "alphabetical", bool showAll = false) {
+    Student tempStudents[MAX_DATA];
+    copy(STUDENTS_DATA, STUDENTS_DATA + s, tempStudents);
+
+    if (sort) {
+        if (sortBy == "alphabetical") {
+            insertionSort(tempStudents, s, sortBy, [](const Student& a, const Student& b) {
+                return a.firstName < b.firstName;
+            });
+        } else if (sortBy == "id") {
+            insertionSort(tempStudents, s, sortBy, [](const Student& a, const Student& b) {
+                return a.id < b.id;
+            });
+        } else if (sortBy == "email") {
+            insertionSort(tempStudents, s, sortBy, [](const Student& a, const Student& b) {
+                return a.email < b.email;
+            });
+        } // TODO: Tambahkan opsi pengurutan lain jika diperlukan
+    }
+
+    cout << "\n--- Daftar Siswa ---" << endl;
+    cout << "ID\tNama\t\tKelas\tNilai" << endl; // Header tabel
+    cout << "-----------------------------------------" << endl;
+
+    for (int i = 0; i < s; i++) {
+        Student& student = tempStudents[i];
+
+        // Filter siswa berdasarkan kelas jika showAll = false (hanya jika loggedIn adalah guru)
+        if (!showAll && loggedIn.isTeacher && (student.classPtr == nullptr || student.classPtr->teacher != loggedIn.teacherPtr)) {
+            continue;
+        }
+
+        cout << student.id << "\t" << student.firstName << " " << student.lastName << "\t";
+
+        // Tampilkan nama kelas jika siswa sudah terdaftar di kelas
+        if (student.classPtr) {
+            cout << student.classPtr->name;
+        } else {
+            cout << "-"; // atau "NULL"
+        }
+        cout << "\t";
+        
+        // Tampilkan nilai siswa
+        cout << student.nilaiRataRata << endl;
+    }
+}
+
+void displayTeachersData(bool sort = false, string sortBy = "alphabetical", bool showAll = false) {
+    Teacher tempTeachers[MAX_DATA];
+    copy(TEACHERS_DATA, TEACHERS_DATA + t, tempTeachers);
+
+    if (sort) {
+        if (sortBy == "alphabetical") {
+            insertionSort(tempTeachers, t, sortBy, [](const Teacher& a, const Teacher& b) {
+                return a.firstName < b.firstName;
+            });
+        } else if (sortBy == "id") {
+            insertionSort(tempTeachers, t, sortBy, [](const Teacher& a, const Teacher& b) {
+                return a.id < b.id;
+            });
+        } else if (sortBy == "email") {
+            insertionSort(tempTeachers, t, sortBy, [](const Teacher& a, const Teacher& b) {
+                return a.email < b.email;
+            });
+        }// TODO: Tambahkan opsi pengurutan lain jika diperlukan
+    }
+
+    cout << "\n--- Daftar Guru ---" << endl;
+    cout << "ID\tNama\t\tEmail" << endl; // Header tabel
+    cout << "-----------------------------------------" << endl;
+
+    for (int i = 0; i < t; i++) {
+        Teacher& teacher = tempTeachers[i];
+        cout << teacher.id << "\t" << teacher.firstName << " " << teacher.lastName << "\t" << teacher.email << endl;
+    }
 }
 
 void mainMenu() {
@@ -133,7 +265,7 @@ void mainMenu() {
         bool loginSuccess = false;
         for (int i = 0; i < t; i++) {
             if ((TEACHERS_DATA[i].username == in || TEACHERS_DATA[i].email == in) && TEACHERS_DATA[i].password == passIn) {
-                loggedIn.update(true, TEACHERS_DATA[i].id, TEACHERS_DATA[i].username, &TEACHERS_DATA[i]);
+                loggedIn.update(true, &TEACHERS_DATA[i]);
                 loggedIn.display();
                 loginSuccess = true;                
                 teacherMenu();
@@ -154,7 +286,7 @@ void mainMenu() {
         bool loginSuccess = false;
         for (int i = 0; i < t; i++) {
             if ((STUDENTS_DATA[i].username == in || STUDENTS_DATA[i].email == in) && STUDENTS_DATA[i].password == passIn) {
-                loggedIn.update(false, STUDENTS_DATA[i].id, STUDENTS_DATA[i].username, nullptr, &STUDENTS_DATA[i]);
+                loggedIn.update(false, nullptr, &STUDENTS_DATA[i]);
                 loggedIn.display();
                 loginSuccess = true;
                 studentMenu();
@@ -188,7 +320,7 @@ void mainMenu() {
         TEACHERS_DATA[t].email = email;
 
         // saveTeachersToCSV(TEACHERS_DATA, "teachers.csv");
-        loggedIn.update(true, id, username, &TEACHERS_DATA[t]);
+        loggedIn.update(true, &TEACHERS_DATA[t]);
         t++;
         loggedIn.display();
 
@@ -224,7 +356,7 @@ void mainMenu() {
         STUDENTS_DATA[s].lastName = lastName;
         STUDENTS_DATA[s].email = email;
 
-        loggedIn.update(false, id, username, nullptr, &STUDENTS_DATA[s]);    
+        loggedIn.update(false, nullptr, &STUDENTS_DATA[s]);    
         s++;        
         loggedIn.display();
 
@@ -258,7 +390,7 @@ void teacherMenu() {
 
         cout << "Pilih kelas yang mana: " << endl;
         if (!foundTeacher || foundTeacher->numClasses == 0) {
-            cout << "Error: Anda tidak bisa membuat tugas karena Anda tidak memiliki kelas" << endl;
+            cout << "Error: Anda tidak memiliki kelas" << endl;
             break;
         }
 
@@ -282,11 +414,22 @@ void teacherMenu() {
 
         switch (opt) {
         case 1: {
-            // TODO
+            displayStudentsData(false, "alphabetical", false);
             break;
         }
         case 2: {
-            // TODO
+            string key;
+            cout << "Masukkan ID atau nama lengkap siswa: ";
+            cin.ignore();
+            getline(cin, key);
+
+            Student* foundStudent = searchStudent(key, selectedClass);
+
+            if (foundStudent) {
+                cout << "\nNilai siswa " << foundStudent->firstName << " " << foundStudent->lastName << ": " << foundStudent->nilaiRataRata << endl;
+            } else {
+                cout << "Siswa dengan ID atau nama " << key << " tidak ditemukan di kelas ini." << endl;
+            }
             break;
         }
         default: {
@@ -305,7 +448,6 @@ void teacherMenu() {
     }
     case 4: {
         teacherClassMenu();
-        addAssignment();
         break;
     }
     default: {
@@ -396,6 +538,11 @@ void seeClass() {
             p++;
 
             cout << "Tugas berhasil dikumpulkan" << endl;    
+        }
+        case 2: {
+            cout << "Nilai akumulasi anda: " << foundStudent->nilaiRataRata << endl;
+            cout << "                      --" << endl;
+            break;
         }
         default: {
             break;
@@ -493,7 +640,7 @@ void assignmentQueue() {
                         }
 
                         // Update nilai siswa
-                        foundStudent->Ipk += nilai;
+                        foundStudent->nilaiRataRata += nilai;
 
                         cout << "Nilai berhasil ditambahkan." << endl;
                         tugasQueue.dequeue(); // Hapus tugas dari antrian setelah dinilai
@@ -550,7 +697,7 @@ void teacherClassMenu() {
             
             cout << "Kelas berhasil dibuat." << endl;
             
-            loggedIn.update(true, foundTeacher->id, foundTeacher->username, foundTeacher);
+            loggedIn.update(true, foundTeacher);
         } else {
             cout << "Error: Guru yang sedang login tidak ditemukan." << endl;
         }        

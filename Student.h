@@ -14,7 +14,7 @@ struct Student {
     string password;
     string firstName, lastName;
     string email;
-    float Ipk;
+    float nilaiRataRata=0;
     Class* classPtr; // pointer to the class the student is enrolled in
 
     // Student(string id, string username, string password, string firstName, string lastName, string email, Class* classPtr = nullptr)
@@ -31,17 +31,6 @@ struct Student {
     void display() {
         cout << id << ", " << username << ", " << password << ", " << firstName << ", " << email << ", " << classPtr->name << endl;
     }
-};
-
-struct CSVRecordStudent {
-    string id;
-    string username;
-    string password;
-    string name;
-    string email;
-
-    CSVRecordStudent(string id, string username, string password, string name, string email)
-    : id(id), username(username), password(password), name(name), email(email) {}     
 };
 
 #endif // STUDENT_H

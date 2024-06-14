@@ -31,15 +31,4 @@ struct Assignment {
     }
 };
 
-Assignment *assign;
-
-struct CSVRecordAssignment {
-    string id;
-    string description;
-    string dueDate;   
-
-    CSVRecordAssignment(string id, string description, string dueDate)
-    : id(id), description(description), dueDate(dueDate) {} 
-};
-
 #endif // ASSIGNMENT_H
