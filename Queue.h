@@ -16,7 +16,7 @@ struct Queue {
     void clear();
     bool isEmpty();
     bool isFull();
-    void print(); // Hapus parameter noAntrian karena tidak diperlukan lagi
+    void print();
 
     Pengumpulan* peek() const { // Fungsi untuk melihat elemen terdepan tanpa menghapus
         if (belakang == -1) {

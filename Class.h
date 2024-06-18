@@ -23,10 +23,9 @@ struct Class {
     // Class(string id, string name, Teacher* teacher = nullptr)
     // : id(id), name(name), teacher(teacher), students(), assignments() {}
 
-    void initialize(string id, string name, Teacher* teacher = nullptr) {
-        id = id;
-        name = name;
-        teacher = teacher;
+    void initialize(string id, string name) {
+        this->id = id;
+        this->name = name;
     }
 
     void setTeacher(Teacher* teacher) {
@@ -52,12 +51,12 @@ struct Class {
         
         cout << "Students: " << endl;
         // for (Student* student : students) {
-        //     cout << "    " << student->id << " " << student->name << endl;
+        //     cout << "ID: " << student->id << "\tName: " << student->username << endl;
         // }
         cout << "Assignments: " << endl;
-        // for (Assignment* assignment : assignments) {
-        //     cout << "    " << assignment->id << " " << assignment->description  << endl;
-        // }
+        for (Assignment* assignment : assignments) {
+            cout << "    " << assignment->id << " " << assignment->description  << endl;
+        }
     }
 };
 

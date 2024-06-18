@@ -20,6 +20,15 @@ struct Teacher {
     Class* classes[MAX_CLASSES]; // Array untuk menyimpan pointer ke kelas
     int numClasses = 0;
 
+    void initialize(string id, string username, string password, string firstName, string lastName, string email) {
+        this->id = id;
+        this->username = username;
+        this->password =  password;
+        this->firstName = firstName;
+        this->lastName = lastName;
+        this->email = email;
+    }
+
     void addClass(Class* cls) {
         if (numClasses < MAX_CLASSES) {
             this->classes[numClasses] = cls; // Tambahkan kelas ke array dan increment numClasses
@@ -42,10 +51,8 @@ struct Teacher {
             } else {
                 cout << "Tidak ada kelas" << endl;
             }
-        }
-        
+        }   
     }
-
 };
 
 

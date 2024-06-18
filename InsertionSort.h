@@ -4,7 +4,7 @@
 #include "Teacher.h"
 template <typename T, typename Compare>
 
-void insertionSort(T arr[], int n, string sortBy, Compare compare) {
+void sortUser(T arr[], int n, string sortBy, Compare compare) {
     for (int i = 1; i < n; i++) {
         T key = arr[i];
         int j = i - 1;
@@ -41,7 +41,7 @@ void insertionSort(T arr[], int n, string sortBy, Compare compare) {
 }
 
 template <typename Compare>
-void classInsertionSort(Class arr[], int n, string sortBy, Compare compare) {
+void sortClass(Class arr[], int n, string sortBy, Compare compare) {
     for (int i = 1; i < n; i++) {
         Class key = arr[i];
         int j = i - 1;
