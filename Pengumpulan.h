@@ -13,6 +13,14 @@ struct Pengumpulan {
     string studentId;
     string studentName;
     time_t timestamp;
+
+    void initialize(string tugasId, string description, string studentId, string studentName) {
+        this->tugasId = tugasId;
+        this->description = description;
+        this->studentId = studentId;
+        this->studentName = studentName;
+        // this->timestamp = time(0);
+    }
 };
 
 #endif // PENGUMPULAN_H

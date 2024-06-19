@@ -41,6 +41,27 @@ struct Class {
         }
     }
 
+    void addAssignment(Assignment* assignment) {
+        this->assignments.push_back(assignment);
+    }
+
+    void removeStudent(Student* s) {
+        if (numStudents == 0) {
+            cout << "Tidak ada siswa dalam kelas ini." << endl;
+            return;
+        }
+        for (int i = 0; i < numStudents; i++) {
+            if (students[i] == s) {
+                for (int j = i; j < numStudents - 1; j++) {
+                    students[j] = students[j + 1];
+                }
+                numStudents--;
+                students[numStudents] = nullptr;
+                cout << "Siswa berhasil dihapus." << endl;
+            }
+        }
+    }
+
     void display() {
         cout << "Class: " << id << " " << name << endl;
         if (teacher != nullptr) {

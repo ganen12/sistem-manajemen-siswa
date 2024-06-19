@@ -34,6 +34,11 @@ struct Student {
         this->nilaiRataRata = 0;
     }
 
+    void removeClass(Class* cls) {
+        this->classPtr = nullptr;
+        this->nilaiRataRata = 0;
+    }
+
     Class* getClass() const { 
         return classPtr;
     }
