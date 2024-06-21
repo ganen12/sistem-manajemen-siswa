@@ -36,6 +36,11 @@ void assignmentQueue();
 void seeClass();
 void joinClass();
 Class* chooseClass();
+void removeClassFromTeacher(Teacher* foundTeacher, Class* classToRemove);
+void removeClassFromClassesData(Class* classToRemove);
+void removeClassFromStudents(Class* classToRemove);
+void removeAssignmentsOfClass(Class* classToRemove);
+void removePengumpulanOfClass(Class* classToRemove); 
 
 // TODO: Pindah fungsi-fungsi dibawah ke file terpisah
 void displayTeachersData(bool sort, string sortBy, bool showAll); // display teachers_data dengan algoritma sorting
@@ -750,7 +755,16 @@ void teacherClassMenu() {
             if (selectedClass == nullptr || selectedClass == NULL) break;
 
             cout << "\nYakin ingin menghapus kelas ini? (y/n): "; cin >> choice; // TODO: lanjut
-            // TODO: Buat input pemilihan kelas menjadi fungsi terpisah
+
+            if (choice != 'y') break;
+            
+            removeClassFromTeacher(foundTeacher, selectedClass);
+            removeClassFromClassesData(selectedClass);
+            removeClassFromStudents(selectedClass);
+            removeAssignmentsOfClass(selectedClass);
+            removePengumpulanOfClass(selectedClass);
+
+            cout << "Kelas berhasil dihapus." << endl;
         }
         case 4: {
             int pilihanSiswa;
@@ -849,4 +863,64 @@ Class* chooseClass() {
     }
 
     return foundTeacher->classes[pilihanKelas - 1];
+}
+
+void removeClassFromTeacher(Teacher* foundTeacher, Class* classToRemove) {
+    foundTeacher->removeClass(classToRemove); // Panggil metode removeClass pada objek teacherPtr   
+}
+
+void removeClassFromClassesData(Class* classToRemove) {
+    for (int i = 0; i < c; ++i) {
+        if (CLASSES_DATA[i].id == classToRemove->id) {
+            // Geser elemen-elemen setelah kelas yang dihapus ke depan
+            for (int j = i; j < c - 1; ++j) {
+                CLASSES_DATA[j] = CLASSES_DATA[j + 1];
+            }
+            c--; // Kurangi jumlah kelas
+            break;
+        }
+    }
+}
+
+void removeClassFromStudents(Class* classToRemove) {
+    for (Student& student : STUDENTS_DATA) {
+        if (student.classPtr == classToRemove) {
+            student.removeClass(classToRemove);
+        }
+    }    
+}
+
+void removeAssignmentsOfClass(Class* classToRemove) {
+    for (int i = 0; i < a; ++i) {
+        if (ASSIGNMENT_DATA[i].classPtr == classToRemove) {
+            // Hapus tugas dari array ASSIGNMENT_DATA (geser elemen)
+            for (int j = i; j < a - 1; ++j) {
+                ASSIGNMENT_DATA[j] = ASSIGNMENT_DATA[j + 1];
+            }
+            a--;
+            i--; // Perbaiki indeks setelah penghapusan
+        }
+    }
+}
+
+void removePengumpulanOfClass(Class* classToRemove) {
+    for (int i = 0; i < p; ++i) {
+        // Cari tugas berdasarkan tugasId
+        Assignment* foundAssignment = nullptr;
+        for (int j = 0; j < a; j++) {
+            if (ASSIGNMENT_DATA[j].id == PENGUMPULAN_DATA[i].tugasId) {
+                foundAssignment = &ASSIGNMENT_DATA[j];
+                break;
+            }
+        }
+
+        // Jika tugas ditemukan dan kelasnya sesuai dengan classToRemove
+        if (foundAssignment && foundAssignment->classPtr == classToRemove) { 
+            for (int j = i; j < p - 1; ++j) {
+                PENGUMPULAN_DATA[j] = PENGUMPULAN_DATA[j + 1]; // geser elemen
+            }
+            p--;
+            i--; // Perbaiki indeks setelah penghapusan
+        }
+    }
 }

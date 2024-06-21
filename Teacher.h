@@ -38,6 +38,22 @@ struct Teacher {
         }
     }
 
+    void removeClass(Class* cls) {
+        for (int i = 0; i < numClasses; i++) {
+            if (classes[i] != nullptr && classes[i]->id == cls->id) {
+                // Hapus kelas dari array
+                for (int j = i; j < numClasses - 1; j++) {
+                    classes[j] = classes[j + 1];
+                }
+                classes[numClasses - 1] = nullptr;
+                numClasses--;
+                cout << "Kelas dengan ID " << cls->id << " berhasil dihapus." << endl;
+                return;
+            }            
+        }
+        cout << "Kelas dengan ID " << cls->id << " tidak ditemukan." << endl;
+    }
+
     void display() {
         cout << "Teacher ID: " << id << endl;
         cout << "Username: " << username << endl;
