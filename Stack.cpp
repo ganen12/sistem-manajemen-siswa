@@ -1,5 +1,6 @@
 #include "Stack.h"
 #include <iostream>
+#include <string>
 #include <ctime>
 #include <iomanip>
 
@@ -15,8 +16,7 @@ void Stack::push(const string& data) {
                             to_string(1 + ltm->tm_mon) + "/" + 
                             to_string(1900 + ltm->tm_year) + " " + 
                             to_string(ltm->tm_hour) + ":" + 
-                            to_string(ltm->tm_min) + ":" + 
-                            to_string(ltm->tm_sec);
+                            to_string(ltm->tm_min);
         top++;
         this->data[top] = timeString + " -- " + data;
     }
@@ -40,13 +40,27 @@ bool Stack::isFull() {
     return (top >= (MAX_STACK - 1));
 }
 
-void Stack::printHistory() {
+void Stack::printHistory(bool isTeacher) {
+    system("CLEAR");
     if (isEmpty()) {
         cout << "History log kosong." << endl;
-    } else {
-        cout << "History Log:" << endl;
+        return;
+    }
+
+    cout << "History Log:" << endl;
+    if (isTeacher) {
         for (int i = this->top; i >= 0; i--) {
-            cout << this->data[i] << endl;
+            if (this->data[i].find("(GURU)") != string::npos) {
+                cout << this->data[i] << endl;
+            }
+        }
+    } else {
+        for (int i = this->top; i >= 0; i--) {
+            if (this->data[i].find("(SISWA)") != string::npos) {
+                cout << this->data[i] << endl;
+            }
         }
     }
+
+    
 }

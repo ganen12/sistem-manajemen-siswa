@@ -19,7 +19,7 @@ struct Stack {
     void clear();
     bool isEmpty();
     bool isFull();
-    void printHistory();
+    void printHistory(bool isTeacher);
 // Fungsi print() tidak diperlukan untuk history log
 
 };

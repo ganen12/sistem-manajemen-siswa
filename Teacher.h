@@ -47,7 +47,6 @@ struct Teacher {
                 }
                 classes[numClasses - 1] = nullptr;
                 numClasses--;
-                cout << "Kelas dengan ID " << cls->id << " berhasil dihapus." << endl;
                 return;
             }            
         }

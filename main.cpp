@@ -7,6 +7,7 @@
 #include <ctime>
 #include <unordered_map>
 
+struct Message;
 struct Student;
 struct Class;
 struct Teacher;
@@ -20,6 +21,7 @@ struct Stack;
 #include "Teacher.h"
 #include "Assignment.h"
 #include "Pengumpulan.h"
+#include "Forum.h"
 #include "Queue.cpp"
 #include "Stack.cpp"
 #include "InsertionSort.h"
@@ -35,6 +37,7 @@ void mainMenu();
 void seeStudentGrades();
 void addAssignment();
 void assignmentQueue();
+void seeDiscussionForum(bool isTeacher);
 void seeClass();
 void joinClass();
 Class* chooseClass();
@@ -402,12 +405,11 @@ void mainMenu() {
             cin >> lastName;
             cout << "Masukkan Email:\n> ";
             cin >> email;
-            cout << "Masukkan Kelas:\n> " << endl;
             
             STUDENTS_DATA[s].initialize(id, username, password, firstName, lastName, email); // TODO: ubah ID menjadi otomatis dan bukan inputan
 
             loggedIn.update(false, nullptr, &STUDENTS_DATA[s]);   
-            historyStack.push("(GURU) " + STUDENTS_DATA[s].fullName() + " berhasil sign up");  
+            historyStack.push("(SISWA) " + STUDENTS_DATA[s].fullName() + " berhasil sign up");  
             
             s++;        
             loggedIn.display();
@@ -439,7 +441,8 @@ void teacherMenu() {
         cout << char(179) <<" 3. Menambah tugas                 " <<char(179) << endl;
         cout << char(179) <<" 4. Manajemen kelas                " <<char(179) << endl;
         cout << char(179) <<" 5. Melihat history log            " <<char(179) << endl;
-        cout << char(179) <<" 6. Keluar                         " <<char(179) << endl;
+        cout << char(179) <<" 6. Forum Diskusi                  " <<char(179) << endl;
+        cout << char(179) <<" 7. Keluar                         " <<char(179) << endl;
         cout << char(192) << string(35, char(196)) << char(217) << endl;
         cout << " Pilih opsi:\n > ";
         cin >> option;
@@ -463,11 +466,16 @@ void teacherMenu() {
             break;
         }
         case 5: {
-            // TODO
+            historyStack.printHistory(true);
             break;
         }
         case 6: {
+            seeDiscussionForum(true);
+            break;
+        }
+        case 7: {
             loggedIn.reset();
+            historyStack.push("(GURU) " + TEACHERS_DATA[t].fullName() + " berhasil log out"); 
             break;
         }
         default: {
@@ -475,7 +483,7 @@ void teacherMenu() {
             break;
         }
         }
-    } while (option != 6);
+    } while (option != 7);
 }
 
 void studentMenu() {
@@ -487,7 +495,8 @@ void studentMenu() {
         cout << char(179) << " 1. Melihat kelas                  " << char(179) <<endl;
         cout << char(179) << " 2. Join kelas                     " << char(179) <<endl;
         cout << char(179) << " 3. Melihat history log            " << char(179) <<endl;
-        cout << char(179) << " 4. Keluar                         " << char(179) <<endl;
+        cout << char(179) << " 4. Forum Diskusi                  " << char(179) <<endl;
+        cout << char(179) << " 5. Keluar                         " << char(179) <<endl;
         cout << char(192) << string(35, char(196)) << char(217) << endl;
 
         cout << " Pilih opsi:\n > ";
@@ -504,18 +513,23 @@ void studentMenu() {
             break;  
         }
         case 3: {
-            // TODO
+            historyStack.printHistory(false);
             break;
         }
         case 4: {
+            seeDiscussionForum(false);
+            break;
+        }
+        case 5: {
             loggedIn.reset();
+            historyStack.push("(SISWA) " + TEACHERS_DATA[t].fullName() + " berhasil log out"); 
             break;
         }
         default: {
             break;
         }
         }
-    } while (option != 4);
+    } while (option != 5);
 }
 
 void seeClass() {
@@ -616,6 +630,11 @@ void joinClass() {
 
     if (c == 0) {
         cout << "Belum ada kelas yang tersedia." << endl;
+        return;
+    }
+
+    if (loggedIn.studentPtr->classPtr != nullptr) {
+        cout << "Anda sudah memiliki kelas." << endl;
         return;
     }
         
@@ -857,20 +876,24 @@ void teacherClassMenu() {
             
             if (selectedClass == nullptr || selectedClass == NULL) break;
 
-            cout << "\nYakin ingin menghapus kelas ini? (y/n):\n> "; cin >> choice; // TODO: lanjut
+            cout << "\nYakin ingin menghapus kelas ini? (y/n):\n> "; cin >> choice;
 
             if (choice != 'y') break;
-            
-            removeClassFromTeacher(foundTeacher, selectedClass);
-            removeClassFromClassesData(selectedClass);
-            removeClassFromStudents(selectedClass);
-            removeAssignmentsOfClass(selectedClass);
-            removePengumpulanOfClass(selectedClass);
+            try {
+                removeClassFromTeacher(foundTeacher, selectedClass);
+                removeClassFromClassesData(selectedClass);
+                removeClassFromStudents(selectedClass);
+                removeAssignmentsOfClass(selectedClass);
+                removePengumpulanOfClass(selectedClass);
 
-            cout << "Kelas berhasil dihapus." << endl;
-            historyStack.push("(GURU) " + foundTeacher->fullName() + " berhasil menghapus kelas: " + selectedClass->name);
-            system("PAUSE");
-            break;
+                cout << "Kelas berhasil dihapus." << endl;
+                historyStack.push("(GURU) " + foundTeacher->fullName() + " berhasil menghapus kelas: " + selectedClass->name);
+                system("PAUSE");
+                break;
+            }
+            catch(const exception& e) {
+                cerr << e.what() << '\n';
+            }
         }
         case 4: {
             int pilihanSiswa;
@@ -1031,5 +1054,63 @@ void removePengumpulanOfClass(Class* classToRemove) {
             p--;
             i--; // Perbaiki indeks setelah penghapusan
         }
+    }
+}
+
+void seeDiscussionForum(bool isTeacher) {
+    system("CLEAR");
+    string messageContent;
+    if (isTeacher) {
+        Teacher* foundTeacher = loggedIn.teacherPtr;
+        Class* selectedClass = chooseClass();
+        if (selectedClass == nullptr || selectedClass == NULL) return;
+
+        do {
+            system("CLEAR");
+            cout << "\t> DISKUSI FORUM KELAS " << selectedClass->name << " <" << endl<< endl;
+            if (selectedClass->discussionForum.empty()) {
+                cout << "Forum kosong." << endl;
+            }
+
+            for (int i = 0; i < selectedClass->discussionForum.size(); ++i) {
+                selectedClass->discussionForum[i].display();
+            }
+
+            cout << "\nKirim pesan:\t\t\tKetik '.exit' untuk keluar\n> ";
+            getline(cin >> ws, messageContent);
+
+            if (messageContent != ".exit") {
+                Message newChat;
+                newChat.setMessage(nullptr, foundTeacher, messageContent);
+                selectedClass->addMessage(&newChat);
+            }
+
+        } while (messageContent != ".exit");
+    } else {
+        Student* foundStudent = loggedIn.studentPtr; 
+        if (foundStudent->classPtr == nullptr || foundStudent->classPtr == NULL) {
+            cout << "Anda belum memiliki kelas." << endl;
+            return;
+        }
+        do {
+            system("CLEAR");
+            cout << "\t== DISKUSI FORUM KELAS " << foundStudent->classPtr->name << " ==" << endl<< endl;
+
+            if (foundStudent->classPtr->discussionForum.empty()) {
+                cout << "Forum kosong." << endl;
+            }
+            for (int i = 0; i < foundStudent->classPtr->discussionForum.size(); ++i) {
+                foundStudent->classPtr->discussionForum[i].display();
+            }
+
+            cout << "\nKirim pesan:\t\t\tKetik '.exit' untuk keluar\n> ";
+            getline(cin >> ws, messageContent);
+            
+            if (messageContent != ".exit") {
+                Message newChat;
+                newChat.setMessage(foundStudent, nullptr, messageContent);
+                foundStudent->classPtr->addMessage(&newChat);    
+            }        
+        } while (messageContent != ".exit");
     }
 }

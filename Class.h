@@ -6,7 +6,7 @@
 #include <vector>
 #include "Assignment.h"
 #include "Student.h"
-
+// #include "Forum.h"
 
 using namespace std;
 
@@ -18,6 +18,7 @@ struct Class {
     Teacher* teacher; // pointer to the teacher of this class
     vector<Assignment*> assignments; // pointers to all assignments in this class
     Student* students[MAX_STUDENTS]; // Array untuk menyimpan pointer ke siswa
+    vector<Message> discussionForum;
     int numStudents = 0;
 
     // Class(string id, string name, Teacher* teacher = nullptr)
@@ -60,6 +61,10 @@ struct Class {
                 cout << "Siswa berhasil dihapus." << endl;
             }
         }
+    }
+
+    void addMessage(const Message* message) {
+        this->discussionForum.push_back(*message);
     }
 
     void display() {
