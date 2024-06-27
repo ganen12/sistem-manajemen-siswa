@@ -13,6 +13,7 @@ struct Teacher;
 struct Assignment;
 struct Pengumpulan;
 struct Queue;
+struct Stack;
 
 #include "Student.h"
 #include "Class.h"
@@ -20,6 +21,7 @@ struct Queue;
 #include "Assignment.h"
 #include "Pengumpulan.h"
 #include "Queue.cpp"
+#include "Stack.cpp"
 #include "InsertionSort.h"
 #include "DisplayData.h"
 #include "SequentialSearch.h"
@@ -89,6 +91,7 @@ struct LoggedIn {
 
 LoggedIn loggedIn;
 Queue tugasQueue;
+Stack historyStack;
 const int MAX_DATA = 200;
 
 int s = 0;
@@ -166,6 +169,7 @@ void displayClassesData(bool sort = false, string sortBy = "alphabetical", bool 
     }   
     cout << endl;
     system("pause"); 
+    system("CLEAR"); 
 }
 
 void displayStudentsData(bool sort = false, string sortBy = "alphabetical", bool showAll = false) {
@@ -219,6 +223,8 @@ void displayStudentsData(bool sort = false, string sortBy = "alphabetical", bool
     }
     cout << endl;
     system("pause"); 
+    system("CLEAR"); 
+
 }
 
 void displayTeachersData(bool sort = false, string sortBy = "alphabetical", bool showAll = false) {
@@ -261,6 +267,7 @@ void displayTeachersData(bool sort = false, string sortBy = "alphabetical", bool
     }
     cout << endl;
     system("pause"); 
+    system("CLEAR"); 
 }
 
 void mainMenu() {
@@ -269,20 +276,34 @@ void mainMenu() {
     string id, username, password, firstName, lastName, email;
     
     do {
-        cout << ">>> Sistem Manajemen Siswa <<<" << endl;
-        cout << "1. Login sebagai Guru" << endl;
-        cout << "2. Login sebagai Siswa" << endl;
-        cout << "3. Sign Up sebagai Guru" << endl;
-        cout << "4. Sign Up sebagai Siswa" << endl;
-        cout << "5. Keluar" << endl;
-        cout << "Pilih opsi:\n-> ";
-        cin >> option;
+        cout << " ____  _     _                   __  __                    _                             " << endl;
+        cout << "/ ___|(_)___| |_ ___ _ __ ___   |  \\/  | __ _ _ __   __ _ (_) ___ _ __ ___   ___ _ __    " << endl; 
+        cout << "\\___ \\| / __| __/ _ \\ '_ ` _ \\  | |\\/| |/ _` | '_ \\ / _` || |/ _ \\ '_ ` _ \\ / _ \\ '_ \\   " << endl; 
+        cout << " ___) | \\__ \\ ||  __/ | | | | | | |  | | (_| | | | | (_| || |  __/ | | | | |  __/ | | |  " << endl; 
+        cout << "|____/|_|___/\\__\\___|_| |_| |_| |_|  |_|\\__,_|_| |_|\\__,_|/ |\\___|_| |_| |_|\\___|_| |_|  " << endl; 
+        cout << "/ ___|(_)_____      ____ _                              |__/                             " << endl;
+        cout << "\\___ \\| |/__\\ \\ /\\ / / _` |                                                              " << endl;
+        cout << " ___) | |\\__ \\ V  V / (_| |                                                              " << endl;
+        cout << "|____/|_|___/ \\_/\\_/ \\__,_|                                                              " << endl << endl;
         
+        cout << char(201) << string(40, char(205)) << char(187) << endl;
+        cout << char(186) << " 1. Login sebagai Guru                  " << char(186) << endl;
+        cout << char(186) << " 2. Login sebagai Siswa                 " << char(186) << endl;
+        cout << char(186) << " 3. Sign Up sebagai Guru                " << char(186) << endl;
+        cout << char(186) << " 4. Sign Up sebagai Siswa               " << char(186) << endl;
+        cout << char(186) << " 5. Keluar                              " << char(186) << endl;
+        cout << char(200) << string(40, char(205)) << char(188) << endl << endl;
+        cout << " Pilih opsi:                            " << endl;
+        cout << " > "; cin >> option;
+        cout << endl;
+        system("CLS");
+
         switch (option) {
         case 1: {
-            cout << "Username/Email:\n-> ";
+            cout << "\t> LOGIN SEBAGAI GURU <" << endl << endl;
+            cout << "Username/Email:\n> ";
             cin >> in;
-            cout << "Password:\n-> ";
+            cout << "Password:\n> ";
             cin >> passIn;
 
             bool loginSuccess = false;
@@ -290,21 +311,28 @@ void mainMenu() {
                 if ((TEACHERS_DATA[i].username == in || TEACHERS_DATA[i].email == in) && TEACHERS_DATA[i].password == passIn) {
                     loggedIn.update(true, &TEACHERS_DATA[i]);
                     loggedIn.display();
-                    loginSuccess = true;                
-                    teacherMenu();
+                    loginSuccess = true;   
+                    historyStack.push("(GURU) " + TEACHERS_DATA[i].fullName() + " berhasil login"); 
+
                     break;
                 }
             }
             if (!loginSuccess) {
-                cout << "Username atau Password salah." << endl;
+                cout << "\nUsername atau Password salah." << endl;
+                system("PAUSE");
+                system("CLS");
                 break;
             }
+            system("CLS");
+            teacherMenu();
+
             break;
         }
         case 2: {
-            cout << "Username/Email:\n-> ";
+            cout << "\t> LOGIN SEBAGAI SISWA <" << endl << endl;
+            cout << "Username/Email:\n> ";
             cin >> in;
-            cout << "Password:\n-> ";
+            cout << "Password:\n> ";
             cin >> passIn;
 
             bool loginSuccess = false;
@@ -313,67 +341,86 @@ void mainMenu() {
                     loggedIn.update(false, nullptr, &STUDENTS_DATA[i]);
                     loggedIn.display();
                     loginSuccess = true;
-                    studentMenu();
+                    historyStack.push("(GURU) " + STUDENTS_DATA[i].fullName() + " berhasil login"); 
+
                     break;
                 } 
             }
             if (!loginSuccess) {
-                cout << "Username atau Password salah." << endl;
-            }        
+                cout << "\nUsername atau Password salah." << endl;
+                system("PAUSE");
+                system("CLS");
+                break;                
+            }
+            system("CLS");   
+            studentMenu();  
+
             break;
         }
         case 3: {   
-            cout << "Masukkan ID: ";
+            cout << "\t> SIGN UP SEBAGAI GURU <" << endl << endl;
+            cout << "Masukkan ID:\n> ";
             cin >> id;
-            cout << "Masukkan Username (tanpa spasi): ";
+            cout << "Masukkan Username (tanpa spasi):\n> ";
             cin >> username;
-            cout << "Masukkan Password: ";
+            cout << "Masukkan Password:\n> ";
             cin >> password;
-            cout << "Masukkan First Name: ";
+            cout << "Masukkan First Name:\n> ";
             cin >> firstName;
-            cout << "Masukkan Last Name: ";
+            cout << "Masukkan Last Name:\n> ";
             cin >> lastName;
-            cout << "Masukkan Email: ";
+            cout << "Masukkan Email:\n> ";
             cin >> email;
 
             TEACHERS_DATA[t].initialize(id, username, password, firstName, lastName, email);
 
             // saveTeachersToCSV(TEACHERS_DATA, "teachers.csv");
             loggedIn.update(true, &TEACHERS_DATA[t]);
+            historyStack.push("(GURU) " + TEACHERS_DATA[t].fullName() + " berhasil sign up"); 
+
             t++;
             loggedIn.display();
 
             cout << "TEACHERS_DATA SEKARANG: " << endl;
             displayTeachersData(false, "alphabetical", true);
             
+            system("CLEAR");
             teacherMenu();
             break; 
         }
         case 4: {   
-            cout << "Masukkan ID: ";
+            cout << "\t> SIGN UP SEBAGAI SISWA <" << endl << endl;
+            cout << "Masukkan ID:\n> ";
             cin >> id;
-            cout << "Masukkan Username (tanpa spasi): ";
+            cout << "Masukkan Username (tanpa spasi):\n> ";
             cin >> username;
-            cout << "Masukkan Password: ";
+            cout << "Masukkan Password:\n> ";
             cin >> password;
-            cout << "Masukkan First Name: ";
+            cout << "Masukkan First Name:\n> ";
             cin >> firstName;
-            cout << "Masukkan Last Name: ";
+            cout << "Masukkan Last Name:\n> ";
             cin >> lastName;
-            cout << "Masukkan Email: ";
+            cout << "Masukkan Email:\n> ";
             cin >> email;
-            cout << "Masukkan Kelas: " << endl;
+            cout << "Masukkan Kelas:\n> " << endl;
             
             STUDENTS_DATA[s].initialize(id, username, password, firstName, lastName, email); // TODO: ubah ID menjadi otomatis dan bukan inputan
 
-            loggedIn.update(false, nullptr, &STUDENTS_DATA[s]);    
+            loggedIn.update(false, nullptr, &STUDENTS_DATA[s]);   
+            historyStack.push("(GURU) " + STUDENTS_DATA[s].fullName() + " berhasil sign up");  
+            
             s++;        
             loggedIn.display();
 
+            system("CLEAR");
             studentMenu();
             break; 
         }
+        case 5: {
+            break;
+        }
         default: {
+            cout << "Pilihan tidak tersedia." << endl;
             break;
         }
         }
@@ -385,15 +432,19 @@ void teacherMenu() {
     int option;
 
     do {
-        cout << "--- MENU GURU ---" << endl;
-        cout << "1. Melihat nilai siswa dari kelas" << endl;
-        cout << "2. Lihat queue tugas" << endl;
-        cout << "3. Menambah tugas" << endl;
-        cout << "4. Manajemen kelas" << endl;
-        cout << "5. Keluar" << endl;
-        cout << "Pilih opsi:\n-> ";
+        cout << endl;
+        cout << char(218) << string(4, char(196)) << " MENU GURU " << string(20, char(196)) << char(191) << endl;
+        cout << char(179) << " 1. Melihat nilai siswa dari kelas "  <<char(179) << endl;
+        cout << char(179) <<" 2. Lihat queue tugas              " <<char(179) << endl;
+        cout << char(179) <<" 3. Menambah tugas                 " <<char(179) << endl;
+        cout << char(179) <<" 4. Manajemen kelas                " <<char(179) << endl;
+        cout << char(179) <<" 5. Melihat history log            " <<char(179) << endl;
+        cout << char(179) <<" 6. Keluar                         " <<char(179) << endl;
+        cout << char(192) << string(35, char(196)) << char(217) << endl;
+        cout << " Pilih opsi:\n > ";
         cin >> option;
 
+        system("CLEAR");
         switch (option) {
         case 1: {
             seeStudentGrades(); 
@@ -412,28 +463,38 @@ void teacherMenu() {
             break;
         }
         case 5: {
+            // TODO
+            break;
+        }
+        case 6: {
             loggedIn.reset();
             break;
         }
         default: {
+            cout << "Error: Pilihan tidak tersedia" << endl << endl;
             break;
         }
         }
-    } while (option != 5);
+    } while (option != 6);
 }
 
 void studentMenu() {
     int option;
 
     do {
-        cout << "--- MENU SISWA ---" << endl;
-        cout << "1. Melihat kelas" << endl;
-        cout << "2. Join kelas" << endl;
-        cout << "3. Keluar" << endl;
-        cout << "Pilih opsi:\n-> ";
+        cout << endl;
+        cout << char(218) << string(4, char(196)) << " MENU SISWA " << string(19, char(196)) << char(191) << endl;
+        cout << char(179) << " 1. Melihat kelas                  " << char(179) <<endl;
+        cout << char(179) << " 2. Join kelas                     " << char(179) <<endl;
+        cout << char(179) << " 3. Melihat history log            " << char(179) <<endl;
+        cout << char(179) << " 4. Keluar                         " << char(179) <<endl;
+        cout << char(192) << string(35, char(196)) << char(217) << endl;
+
+        cout << " Pilih opsi:\n > ";
         cin >> option;
         
-        switch (option) {
+        system("CLEAR");
+        switch (option) { 
         case 1: {
             seeClass();
             break;
@@ -443,6 +504,10 @@ void studentMenu() {
             break;  
         }
         case 3: {
+            // TODO
+            break;
+        }
+        case 4: {
             loggedIn.reset();
             break;
         }
@@ -450,31 +515,39 @@ void studentMenu() {
             break;
         }
         }
-    } while (option != 3);
+    } while (option != 4);
 }
 
 void seeClass() {
     Student* foundStudent = loggedIn.studentPtr; // Inisialisasi dengan nullptr
 
-    if (foundStudent->classPtr != nullptr) {
+    if (foundStudent->classPtr != nullptr || foundStudent->classPtr != NULL) {
+        historyStack.push("(SISWA) " + foundStudent->fullName() + " melihat info kelas " + foundStudent->classPtr->name);
         int opt;
         do {
-            cout << "-- INFO KELAS -- " << endl;
-            cout << "Nama Kelas: " << foundStudent->classPtr->name << endl;
-            cout << "ID: " << foundStudent->classPtr->id << endl;
-            cout << "Guru: " << foundStudent->classPtr->teacher->username << endl << endl;
+            cout << "+--- INFO KELAS ------------------+" << endl;
+            cout << "> Nama Kelas : " << foundStudent->classPtr->name << endl << endl;
+            cout << "> ID         : " << foundStudent->classPtr->id << endl << endl;
+            cout << "> Guru       : " << foundStudent->classPtr->teacher->username << endl;
+            cout << "+---------------------------------+" << endl << endl;
 
-            cout << "1. Lihat tugas" << endl;
-            cout << "2. Lihat akumulasi nilai anda" << endl;
-            cout << "3. Kembali" << endl;
-            cout << "Pilih opsi: "; cin >> opt;
+            cout << char(218) << string(4, char(196)) << " MENU KELAS " << string(19, char(196)) << char(191) << endl;
+            cout << char(179) <<" 1. Lihat tugas                    " << char(179) <<endl;
+            cout << char(179) <<" 2. Lihat akumulasi nilai anda     " << char(179) <<endl;
+            cout << char(179) <<" 3. Kembali                        " << char(179) << endl;
+            cout << char(192) << string(35, char(196)) << char(217)  << endl;
+        
+            cout << " Pilih opsi:\n > "; 
+            cin >> opt;
 
+            system("CLEAR");
             switch (opt) {
             case 1: {
                 string inputId;
 
                 if (foundStudent->classPtr->assignments.empty()) { // TODO: belum dilakukan pengetesan
-                    cout << "Saat ini Anda tidak memiliki tugas" << endl;
+                    cout << "Saat ini Anda tidak memiliki tugas" << endl << endl;
+                    system("PAUSE");
                     break;            
                 }
                 
@@ -511,21 +584,25 @@ void seeClass() {
                 tugasQueue.enqueue(&PENGUMPULAN_DATA[p]);
                 p++;
 
-                cout << "Tugas berhasil dikumpulkan" << endl;    
+                cout << "Tugas berhasil dikumpulkan" << endl;   
+                historyStack.push("(SISWA) " + foundStudent->fullName() + " berhasil mengumpulkan tugas " + inputId);
+ 
             }
             case 2: {
                 cout << "Nilai akumulasi anda: " << foundStudent->nilaiRataRata << endl;
-                cout << "                      --" << endl;
+                cout << "                      --" << endl << endl;
+                system("PAUSE");
                 break;
             }
             default: {
+                cout << "Error: Pilihan tidak tersedia" << endl;
                 break;
             }    
             }
         } while (opt != 3);
     } else {
         char opt;
-        cout << "Anda belum memiliki kelas. Ikuti kelas? (y/n)\n->";
+        cout << "Anda belum memiliki kelas. Ikuti kelas? (y/n)\n> ";
         cin >> opt;
         if (opt == 'y' || opt == 'Y') {
             joinClass();
@@ -537,16 +614,16 @@ void joinClass() {
     string id;
     bool foundClass = false;
 
-    cout << "Kelas yang tersedia:" << endl;
     if (c == 0) {
         cout << "Belum ada kelas yang tersedia." << endl;
         return;
     }
-    
+        
+    cout << "Kelas yang tersedia:" << endl;    
     for (int i = 0; i < c; i++) {
         cout << "Id: " << CLASSES_DATA[i].id << " - Nama: " << CLASSES_DATA[i].name << endl;
     }
-    cout << "Masukkan ID kelas: ";
+    cout << "\nMasukkan ID kelas:\n> ";
     cin >> id;
 
     for (int i = 0; i < c; i++) {
@@ -555,6 +632,7 @@ void joinClass() {
             loggedIn.studentPtr->setClass(&CLASSES_DATA[i]);
             foundClass = true;
             cout << "Berhasil mengikuti kelas " << CLASSES_DATA[i].name << endl;
+            historyStack.push("(SISWA) " + loggedIn.studentPtr->fullName() + " berhasil join ke kelas " + CLASSES_DATA[i].name);
             break; 
         } 
     }
@@ -571,54 +649,68 @@ void seeStudentGrades() {
 
     Class* selectedClass = chooseClass();
     if (selectedClass == nullptr || selectedClass == NULL) return;
+    
+    do {
+        cout << endl;
+        cout << char(218) << string(4, char(196)) << " LIHAT AKUMULASI NILAI SISWA " << string(13, char(196)) << char(191) << endl;
+        cout << char(179) <<" 1. Tampilkan semua nilai siswa di kelas ini  " << char(179) << endl;
+        cout << char(179) <<" 2. Cari nilai satu siswa di kelas            " << char(179) << endl;
+        cout << char(192) << string(46, char(196)) << char(217) << endl;
+       
+        cout << " Pilih opsi:\n > ";
+        cin >> opt; 
 
-    cout << endl;
-    cout << "1. Tampilkan semua nilai siswa di kelas " << selectedClass->name << endl;
-    cout << "2. Cari nilai satu siswa di kelas " << selectedClass->name << endl;
-    cout << "Pilih opsi:\n-> ";
-    cin >> opt; 
+        switch (opt) {
+        case 1: {
+            displayStudentsData(false, "alphabetical", false);
+            historyStack.push("(GURU) " + foundTeacher->fullName() + " melihat semua nilai siswa di kelas " + selectedClass->name);
 
-    switch (opt) {
-    case 1: {
-        displayStudentsData(false, "alphabetical", false);
-        break;
-    }
-    case 2: {
-        string key;
-        cout << "Masukkan ID atau nama lengkap siswa: ";
-        cin.ignore();
-        getline(cin, key);
-
-        Student* foundStudent = searchStudent(key, selectedClass);
-
-        if (foundStudent) {
-            cout << "\nNilai siswa " << foundStudent->firstName << " " << foundStudent->lastName << ": " << foundStudent->nilaiRataRata << endl;
-        } else {
-            cout << "Siswa dengan ID atau nama " << key << " tidak ditemukan di kelas ini." << endl;
+            break;
         }
-        break;
-    }
-    default: {
-        break;
-    }
-    }
-    return;
+        case 2: {
+            string key;
+            cout << "Masukkan ID atau nama lengkap siswa:\n> ";
+            cin.ignore();
+            getline(cin, key);
+
+            Student* foundStudent = searchStudent(key, selectedClass);
+
+            if (foundStudent) {
+                cout << "\nNilai siswa " << foundStudent->firstName << " " << foundStudent->lastName << ": " << foundStudent->nilaiRataRata << endl;
+            } else {
+                cout << "Siswa dengan ID atau nama " << key << " tidak ditemukan di kelas ini." << endl;
+            }
+            historyStack.push("(GURU) " + foundTeacher->fullName() + " melihat nilai dari siswa  " + foundStudent->fullName());
+            break;
+        }
+        default: {
+            break;
+        }
+        }
+        return;
+    } while (opt != 3);
 }
 
 void assignmentQueue() {
     int option;
+    Teacher* foundTeacher = loggedIn.teacherPtr;
 
     do {
-        cout << "\n--- Queue Tugas ---" << endl;
-        cout << "1. Lihat queue tugas" << endl;
-        cout << "2. Periksa tugas dari queue terdepan" << endl;
-        cout << "3. Keluar" << endl;
-        cout << "Pilih opsi:\n-> ";
+        cout << char(218) << string(4, char(196)) << " ANTRIAN TUGAS " << string(16, char(196)) << char(191) << endl;
+        cout << char(179) <<" 1. Lihat queue tugas              " << char(179) <<endl;
+        cout << char(179) <<" 2. Cek tugas dari queue terdepan  " << char(179) << endl;
+        cout << char(179) <<" 3. Keluar                         " << char(179) << endl;
+        cout << char(192) << string(35, char(196)) << char(217)  << endl;
+
+        cout << " Pilih opsi:\n > ";
         cin >> option;
 
+        system("CLEAR");
         switch (option) {
         case 1: { // Lihat antrian tugas
             tugasQueue.print(); // Tampilkan semua tugas di antrian
+            historyStack.push("(GURU) " + foundTeacher->fullName() + " melihat queue tugas");
+
             break;
         }
         case 2: { // Periksa tugas dari antrian depan
@@ -664,6 +756,7 @@ void assignmentQueue() {
                         foundStudent->nilaiRataRata += nilai;
 
                         cout << "Nilai berhasil ditambahkan." << endl;
+                        historyStack.push("(GURU) " + foundTeacher->fullName() + " berhasil menambahkan nilai ke siswa " + foundStudent->fullName());
                         tugasQueue.dequeue(); // Hapus tugas dari antrian setelah dinilai
                     }
                 } else {
@@ -691,22 +784,25 @@ void teacherClassMenu() {
     Teacher* foundTeacher = loggedIn.teacherPtr; // foundTeacher adalah yang sedang login saat ini
 
     do {
-        cout << "--- MANAJEMEN KELAS ---" << endl;
-        cout << "1. Membuat kelas" << endl;
-        cout << "2. Mengedit kelas" << endl;
-        cout << "3. Menghapus kelas" << endl;
-        cout << "4. Menghapus siswa dari kelas" << endl;
-        cout << "5. Melihat kelas yang Anda ajar" << endl;
-        cout << "6. Keluar" << endl;
-        cout << "Pilih opsi:\n-> ";
+        cout << "\n" << char(218) << string(4, char(196)) << " MANAJEMEN KELAS " << string(14, char(196)) << char(191) << endl;
+        cout << char(179) << " 1. Membuat kelas                  " << char(179) <<endl;
+        cout << char(179) << " 2. Mengedit kelas                 " << char(179) <<endl;
+        cout << char(179) << " 3. Menghapus kelas                " << char(179) <<endl;
+        cout << char(179) << " 4. Menghapus siswa dari kelas     " << char(179) <<endl;
+        cout << char(179) << " 5. Melihat kelas yang Anda ajar   " << char(179) <<endl;
+        cout << char(179) << " 6. Keluar                         " << char(179) << endl;
+        cout << char(192) << string(35, char(196)) << char(217)  << endl;
+        cout << " Pilih opsi:\n > ";
 
         cin >> option;
 
+        system("CLEAR");
         switch (option) {
         case 1: {
-            cout << "Masukkan ID kelas: ";
+            cout << " > MEMBUAT KELAS < " << endl;
+            cout << "Masukkan ID kelas:\n> ";
             cin >> id; cin.ignore();
-            cout << "Masukkan Nama kelas: ";
+            cout << "Masukkan Nama kelas:\n> ";
             getline(cin, name);
 
             if (foundTeacher) {
@@ -714,10 +810,11 @@ void teacherClassMenu() {
                 CLASSES_DATA[c].setTeacher(foundTeacher);
         
                 foundTeacher->addClass(&CLASSES_DATA[c]);
+
+                cout << "\nKelas berhasil dibuat." << endl;
+                historyStack.push("(GURU) " + foundTeacher->fullName() + " berhasil membuat kelas: " + CLASSES_DATA[c].name);
                 c++;
-                
-                cout << "Kelas berhasil dibuat." << endl;
-                
+
                 loggedIn.update(true, foundTeacher);
             } else {
                 cout << "Error: Guru yang sedang login tidak ditemukan." << endl;
@@ -727,34 +824,40 @@ void teacherClassMenu() {
         }
         case 2: {
             string newName, newId;
+            cout << "> MENGEDIT KELAS <" << endl;
             Class* selectedClass = chooseClass();
             cin.ignore();
 
             if (selectedClass == nullptr || selectedClass == NULL) break;
 
-            cout << "Masukkan nama kelas baru (tekan '0' untuk membatalkan):\n-> "; 
+            cout << "Masukkan nama kelas baru (tekan '0' untuk membatalkan):\n> "; 
             getline(cin, newName);
             if (newName != "0") {
                 selectedClass->name = newName;
             }   
 
-            cout << "Masukkan id kelas baru (tekan '0' untuk membatalkan):\n-> ";
+            cout << "Masukkan id kelas baru (tekan '0' untuk membatalkan):\n> ";
             cin >> newId;
 
             if (newId != "0") {
                 selectedClass->id = newId;
             }
 
-            cout << "\nKelas berhasil diedit." << endl;
+            if (newId != "0" && newName != "0") {
+                cout << "\nKelas berhasil diedit." << endl;
+                historyStack.push("(GURU) " + foundTeacher->fullName() + " berhasil mengedit kelas: " + selectedClass->name);
+            }
+            system("PAUSE");
             break;
         }
         case 3: {
             char choice;
+            cout << "> MENGHAPUS KELAS <" << endl;
             Class* selectedClass = chooseClass();
             
             if (selectedClass == nullptr || selectedClass == NULL) break;
 
-            cout << "\nYakin ingin menghapus kelas ini? (y/n): "; cin >> choice; // TODO: lanjut
+            cout << "\nYakin ingin menghapus kelas ini? (y/n):\n> "; cin >> choice; // TODO: lanjut
 
             if (choice != 'y') break;
             
@@ -765,10 +868,13 @@ void teacherClassMenu() {
             removePengumpulanOfClass(selectedClass);
 
             cout << "Kelas berhasil dihapus." << endl;
+            historyStack.push("(GURU) " + foundTeacher->fullName() + " berhasil menghapus kelas: " + selectedClass->name);
+            system("PAUSE");
+            break;
         }
         case 4: {
             int pilihanSiswa;
-            
+            cout << "> MENGHAPUS SISWA DARI KELAS < " << endl;
             Class* selectedClass = chooseClass();
             if (selectedClass == nullptr || selectedClass == NULL) break;
 
@@ -777,12 +883,12 @@ void teacherClassMenu() {
                 break;
             }
             
-            cout << "\nPilih siswa yang ingin dihapus dari kelas: " << endl;
+            cout << "\nPilih siswa yang ingin dihapus dari kelas (pilih nomor): " << endl;
             for (int i = 0; i < selectedClass->numStudents; ++i) {
                 cout << i + 1 << ". " << selectedClass->students[i]->firstName << " " << selectedClass->students[i]->lastName << " - " << selectedClass->students[i]->id << endl;
             }
 
-            cout << "-> "; cin >> pilihanSiswa;
+            cout << "\n> "; cin >> pilihanSiswa;
             if (pilihanSiswa < 1 || pilihanSiswa > selectedClass->numStudents) {
                 cout << "Pilihan tidak valid." << endl;
                 break;
@@ -791,7 +897,10 @@ void teacherClassMenu() {
             Student* selectedStudent = selectedClass->students[pilihanSiswa - 1];
             selectedClass->removeStudent(selectedStudent);
             selectedStudent->removeClass(selectedClass);
-            // TODO
+
+            cout << "Siswa bernama" + selectedStudent->fullName() + " berhasil dihapus dari kelas ini." << endl;
+            historyStack.push("(GURU) " + foundTeacher->fullName() + " berhasil menghapus siswa bernama " + selectedStudent->fullName() + " dari kelas " + selectedClass->name);
+            system("PAUSE");
             break;
         }
         case 5: {
@@ -818,12 +927,12 @@ void addAssignment() {
         return;
     }
 
-    cout << "--- Buat Tugas ---" << endl;
-    cout << "Masukkan ID Tugas: ";
+    cout << "> MEMBUAT TUGAS <" << endl;
+    cout << "Masukkan ID Tugas:\n> ";
     cin >> id;
-    cout << "Masukkan Nama/Deskripsi Tugas (format: <pelajaran> - <deskripsi>):\n";
+    cout << "Masukkan Nama/Deskripsi Tugas (format: <pelajaran> - <deskripsi>):\n> ";
     getline(cin >> ws, description);
-    cout << "Tanggal tenggat Tugas (format: dd-mm-yy): ";
+    cout << "Tanggal tenggat Tugas (format: dd-mm-yy):\n> ";
     cin >> dueDate;
 
     Class* selectedClass = chooseClass();
@@ -837,7 +946,7 @@ void addAssignment() {
     selectedClass->assignments.push_back(&ASSIGNMENT_DATA[a]); 
     // selectedClass->addAssignment(&ASSIGNMENT_DATA[a]);
     cout << "Tugas berhasil ditambahkan oleh " << ASSIGNMENT_DATA[a].classPtr->teacher->username << endl;
-
+    historyStack.push("(GURU) " + foundTeacher->fullName() + " berhasil menambahkan tugas " + ASSIGNMENT_DATA[a].id + "ke kelas: " + selectedClass->name);
     a++;    
     // saveClassesToCSV(CLASSES_DATA, "classes.csv");
 }

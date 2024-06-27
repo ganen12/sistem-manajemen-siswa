@@ -49,7 +49,7 @@ bool Queue::isFull() {
 
 void Queue::print() {
     if (isEmpty()) {
-        cout << "Queue masih kosong !!!" << endl;
+        cout << "Queue masih kosong" << endl;
         return;
     }
     cout << "Isi Queue: " << endl;

@@ -43,6 +43,10 @@ struct Student {
         return classPtr;
     }
 
+    string fullName() {
+        return this->firstName + " " + this->lastName;
+    }
+
     void display() {
         cout << id << ", " << username << ", " << password << ", " << firstName << ", " << email << ", " << classPtr->name << endl;
     }

@@ -53,6 +53,10 @@ struct Teacher {
         }
         cout << "Kelas dengan ID " << cls->id << " tidak ditemukan." << endl;
     }
+    
+    string fullName() {
+        return this->firstName + " " + this->lastName;
+    }
 
     void display() {
         cout << "Teacher ID: " << id << endl;
