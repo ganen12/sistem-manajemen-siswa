@@ -54,7 +54,7 @@ void Queue::print() {
     }
     cout << "Isi Queue: " << endl;
     for (int i = depan; i <= belakang; i++) {
-        cout << i + 1 << ". ID Tugas: " << data[i]->tugasId << " - Dikumpulkan oleh " << data[i]->studentName << endl; // Tampilkan informasi pengumpulan
+        cout << i + 1 << ". ID Tugas: " << data[i]->tugasId << " -- Dikumpulkan oleh " << data[i]->studentName << endl; // Tampilkan informasi pengumpulan
         cout << data[i]->description << endl;
     }
 

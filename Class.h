@@ -67,6 +67,9 @@ struct Class {
         this->discussionForum.push_back(*message);
     }
 
+    void deleteForum() {
+        this->discussionForum.clear();
+    }
     void display() {
         cout << "Class: " << id << " " << name << endl;
         if (teacher != nullptr) {

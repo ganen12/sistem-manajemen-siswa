@@ -22,6 +22,7 @@ struct Stack;
 #include "Assignment.h"
 #include "Pengumpulan.h"
 #include "Forum.h"
+#include "Nilai.h"
 #include "Queue.cpp"
 #include "Stack.cpp"
 #include "InsertionSort.h"
@@ -38,6 +39,7 @@ void seeStudentGrades();
 void addAssignment();
 void assignmentQueue();
 void seeDiscussionForum(bool isTeacher);
+void setNilaiToSubject(Student* foundStudent, Assignment* assignment, float nilai);
 void seeClass();
 void joinClass();
 Class* chooseClass();
@@ -72,16 +74,16 @@ struct LoggedIn {
     
     void display() {
         cout << "Saat ini logged in:" << endl;
-        cout << "\t" << (isTeacher ? "Guru" : "Siswa") << endl;
+        cout << "   > " << (isTeacher ? "Guru" : "Siswa") << endl;
 
         if (isTeacher) {
-            cout << "\tID: " << teacherPtr->id << endl;
-            cout << "\tUSERNAME: " << teacherPtr->username << endl;
+            cout << "   > ID: " << teacherPtr->id << endl;
+            cout << "   > USERNAME: " << teacherPtr->username << endl;
         } else if (!isTeacher) {
-            cout << "\tID: " << studentPtr->id << endl;
-            cout << "\tUSERNAME: " << studentPtr->username << endl;
+            cout << "   > ID: " << studentPtr->id << endl;
+            cout << "   > USERNAME: " << studentPtr->username << endl;
         } else {
-            cout << "\tInformasi pengguna tidak ditemukan." << endl;
+            cout << "   > Informasi pengguna tidak ditemukan." << endl;
         }
     }
 
@@ -222,7 +224,7 @@ void displayStudentsData(bool sort = false, string sortBy = "alphabetical", bool
         cout << "\t\t";
         
         // Tampilkan nilai siswa
-        cout << student.nilaiRataRata << endl;
+        cout << student.nilaiPtr->getSumOfNilai() << endl;
     }
     cout << endl;
     system("pause"); 
@@ -344,7 +346,7 @@ void mainMenu() {
                     loggedIn.update(false, nullptr, &STUDENTS_DATA[i]);
                     loggedIn.display();
                     loginSuccess = true;
-                    historyStack.push("(GURU) " + STUDENTS_DATA[i].fullName() + " berhasil login"); 
+                    historyStack.push("(SISWA) " + STUDENTS_DATA[i].fullName() + " berhasil login"); 
 
                     break;
                 } 
@@ -355,7 +357,7 @@ void mainMenu() {
                 system("CLS");
                 break;                
             }
-            system("CLS");   
+            system("CLEAR");   
             studentMenu();  
 
             break;
@@ -383,10 +385,7 @@ void mainMenu() {
 
             t++;
             loggedIn.display();
-
-            cout << "TEACHERS_DATA SEKARANG: " << endl;
-            displayTeachersData(false, "alphabetical", true);
-            
+            system("PAUSE");
             system("CLEAR");
             teacherMenu();
             break; 
@@ -406,7 +405,8 @@ void mainMenu() {
             cout << "Masukkan Email:\n> ";
             cin >> email;
             
-            STUDENTS_DATA[s].initialize(id, username, password, firstName, lastName, email); // TODO: ubah ID menjadi otomatis dan bukan inputan
+            Nilai* nilaiPtr =  new Nilai(8);
+            STUDENTS_DATA[s].initialize(id, username, password, firstName, lastName, email, nilaiPtr); // TODO: ubah ID menjadi otomatis dan bukan inputan
 
             loggedIn.update(false, nullptr, &STUDENTS_DATA[s]);   
             historyStack.push("(SISWA) " + STUDENTS_DATA[s].fullName() + " berhasil sign up");  
@@ -420,6 +420,19 @@ void mainMenu() {
         }
         case 5: {
             break;
+        }
+        case 333: {
+            system("CLEAR");
+            cout << "TEACHERS_DATA: " << endl;
+            displayTeachersData(false, "alphabetical", true);      
+
+            cout << endl;
+            cout << "STUDENTS_DATA: " << endl;
+            displayStudentsData(false, "alphabetical", true);
+            
+            cout << endl;
+            cout << "CLASSES_DATA: " << endl;
+            displayClassesData(false, "alphabetical", true);      
         }
         default: {
             cout << "Pilihan tidak tersedia." << endl;
@@ -437,12 +450,12 @@ void teacherMenu() {
         cout << endl;
         cout << char(218) << string(4, char(196)) << " MENU GURU " << string(20, char(196)) << char(191) << endl;
         cout << char(179) << " 1. Melihat nilai siswa dari kelas "  <<char(179) << endl;
-        cout << char(179) <<" 2. Lihat queue tugas              " <<char(179) << endl;
-        cout << char(179) <<" 3. Menambah tugas                 " <<char(179) << endl;
-        cout << char(179) <<" 4. Manajemen kelas                " <<char(179) << endl;
-        cout << char(179) <<" 5. Melihat history log            " <<char(179) << endl;
-        cout << char(179) <<" 6. Forum Diskusi                  " <<char(179) << endl;
-        cout << char(179) <<" 7. Keluar                         " <<char(179) << endl;
+        cout << char(179) << " 2. Lihat queue tugas              " <<char(179) << endl;
+        cout << char(179) << " 3. Menambah tugas                 " <<char(179) << endl;
+        cout << char(179) << " 4. Manajemen kelas                " <<char(179) << endl;
+        cout << char(179) << " 5. Melihat history log            " <<char(179) << endl;
+        cout << char(179) << " 6. Forum Diskusi                  " <<char(179) << endl;
+        cout << char(179) << " 7. Keluar                         " <<char(179) << endl;
         cout << char(192) << string(35, char(196)) << char(217) << endl;
         cout << " Pilih opsi:\n > ";
         cin >> option;
@@ -591,6 +604,8 @@ void seeClass() {
                 PENGUMPULAN_DATA[p].studentName = foundStudent->firstName + " " + foundStudent->lastName;
                 for (int i = 0; i < foundStudent->classPtr->assignments.size(); i++) {
                     if (foundStudent->classPtr->assignments[i]->id == inputId) {
+                        PENGUMPULAN_DATA[p].subjectId = foundStudent->classPtr->assignments[i]->subjectId;
+                        PENGUMPULAN_DATA[p].subject = foundStudent->classPtr->assignments[i]->subject;
                         PENGUMPULAN_DATA[p].description = foundStudent->classPtr->assignments[i]->id;
                         break;
                     }  
@@ -600,12 +615,27 @@ void seeClass() {
 
                 cout << "Tugas berhasil dikumpulkan" << endl;   
                 historyStack.push("(SISWA) " + foundStudent->fullName() + " berhasil mengumpulkan tugas " + inputId);
- 
+                break;
             }
             case 2: {
-                cout << "Nilai akumulasi anda: " << foundStudent->nilaiRataRata << endl;
-                cout << "                      --" << endl << endl;
+                
+                cout << "Nilai akumulasi setiap mapel: " << endl << endl;
+                cout << "  MAPEL              |   NILAI   " << endl;
+                cout << "---------------------+-----------+" << endl;
+                cout << "  Bahasa Indonesia   |  " << foundStudent->nilaiPtr->getNilai(BAHASA_INDONESIA) << endl;
+                cout << "  Bahasa Inggris     |  " << foundStudent->nilaiPtr->getNilai(BAHASA_INGGRIS) << endl;
+                cout << "  Matematika         |  " << foundStudent->nilaiPtr->getNilai(MATEMATIKA) << endl;
+                cout << "  IPA                |  " << foundStudent->nilaiPtr->getNilai(IPA) << endl;
+                cout << "  IPS                |  " << foundStudent->nilaiPtr->getNilai(IPS) << endl;
+                cout << "  PKN                |  " << foundStudent->nilaiPtr->getNilai(PKN) << endl;
+                cout << "  Seni Budaya        |  " << foundStudent->nilaiPtr->getNilai(SENI_BUDAYA) << endl;
+                cout << "  Penjaskes          |  " << foundStudent->nilaiPtr->getNilai(PENJASKES) << endl << endl;
+
+                cout << "Total Rata-Rata      |  " << foundStudent->nilaiPtr->getSumOfNilai() << endl;
                 system("PAUSE");
+                break;
+            }
+            case 3: {
                 break;
             }
             default: {
@@ -625,6 +655,7 @@ void seeClass() {
 }
 
 void joinClass() {
+    system("CLEAR");
     string id;
     bool foundClass = false;
 
@@ -640,7 +671,7 @@ void joinClass() {
         
     cout << "Kelas yang tersedia:" << endl;    
     for (int i = 0; i < c; i++) {
-        cout << "Id: " << CLASSES_DATA[i].id << " - Nama: " << CLASSES_DATA[i].name << endl;
+        cout << "> ID: " << CLASSES_DATA[i].id << " -- Nama: " << CLASSES_DATA[i].name << endl;
     }
     cout << "\nMasukkan ID kelas:\n> ";
     cin >> id;
@@ -695,7 +726,21 @@ void seeStudentGrades() {
             Student* foundStudent = searchStudent(key, selectedClass);
 
             if (foundStudent) {
-                cout << "\nNilai siswa " << foundStudent->firstName << " " << foundStudent->lastName << ": " << foundStudent->nilaiRataRata << endl;
+                cout << "Nama siswa: " << foundStudent->fullName() << endl;
+                cout << "Nilai akumulasi setiap mapel: " << endl << endl;
+                cout << "  MAPEL              |   NILAI   " << endl;
+                cout << "---------------------+-----------+" << endl;
+                cout << "  Bahasa Indonesia   |  " << foundStudent->nilaiPtr->getNilai(BAHASA_INDONESIA) << endl;
+                cout << "  Bahasa Inggris     |  " << foundStudent->nilaiPtr->getNilai(BAHASA_INGGRIS) << endl;
+                cout << "  Matematika         |  " << foundStudent->nilaiPtr->getNilai(MATEMATIKA) << endl;
+                cout << "  IPA                |  " << foundStudent->nilaiPtr->getNilai(IPA) << endl;
+                cout << "  IPS                |  " << foundStudent->nilaiPtr->getNilai(IPS) << endl;
+                cout << "  PKN                |  " << foundStudent->nilaiPtr->getNilai(PKN) << endl;
+                cout << "  Seni Budaya        |  " << foundStudent->nilaiPtr->getNilai(SENI_BUDAYA) << endl;
+                cout << "  Penjaskes          |  " << foundStudent->nilaiPtr->getNilai(PENJASKES) << endl << endl;
+
+                cout << "Total Rata-Rata      |  " << foundStudent->nilaiPtr->getSumOfNilai() << endl;
+                system("PAUSE");
             } else {
                 cout << "Siswa dengan ID atau nama " << key << " tidak ditemukan di kelas ini." << endl;
             }
@@ -758,11 +803,14 @@ void assignmentQueue() {
                     // Pastikan guru yang login adalah guru yang mengajar kelas tugas tersebut
                     if (assignment->classPtr->teacher == loggedIn.teacherPtr) {
                         cout << "\n--------------------" << endl;
-                        cout << "Tugas: " << assignment->description << endl;
+                        cout << "ID Tugas: " << assignment->id << endl;
+                        cout << "Mapel: " << assignment->subject << endl;
+                        cout << "Deskripsi: " << assignment->description << endl;
                         cout << "Kelas: " << assignment->classPtr->name << endl;
                         cout << "Dikumpulkan oleh: " << foundStudent->firstName << " " << foundStudent->lastName << " (" << foundStudent->id << ")" << endl;
 
-                        int nilai;
+                        float nilai;
+                        
                         cout << "Masukkan nilai (1-100): ";
                         cin >> nilai;
 
@@ -771,12 +819,15 @@ void assignmentQueue() {
                             cin >> nilai;
                         }
 
-                        // Update nilai siswa
-                        foundStudent->nilaiRataRata += nilai;
+                        try {
+                            setNilaiToSubject(foundStudent, assignment, nilai); // Update nilai siswa
 
-                        cout << "Nilai berhasil ditambahkan." << endl;
-                        historyStack.push("(GURU) " + foundTeacher->fullName() + " berhasil menambahkan nilai ke siswa " + foundStudent->fullName());
-                        tugasQueue.dequeue(); // Hapus tugas dari antrian setelah dinilai
+                            cout << "Nilai berhasil ditambahkan." << endl;
+                            historyStack.push("(GURU) " + foundTeacher->fullName() + " berhasil menambahkan nilai ke siswa " + foundStudent->fullName());
+                            tugasQueue.dequeue(); // Hapus tugas dari antrian setelah dinilai
+                        } catch(const exception& e) {
+                            cerr << e.what() << '\n';
+                        }
                     }
                 } else {
                     cout << "Tugas atau siswa tidak ditemukan." << endl;
@@ -939,6 +990,7 @@ void teacherClassMenu() {
 
 void addAssignment() {
     string id, description, dueDate, classId;
+    int subjectNum;
 
     Teacher* foundTeacher = loggedIn.teacherPtr; // Inisialisasi dengan nullptr
     if (loggedIn.studentPtr) {
@@ -953,7 +1005,15 @@ void addAssignment() {
     cout << "> MEMBUAT TUGAS <" << endl;
     cout << "Masukkan ID Tugas:\n> ";
     cin >> id;
-    cout << "Masukkan Nama/Deskripsi Tugas (format: <pelajaran> - <deskripsi>):\n> ";
+    cout << "Masukkan Mata Pelajaran:" << endl;
+    cout << "1. Bahasa Indonesia\n2. Bahasa Inggris\n3. Matematika\n4. IPA\n5. IPS\n6. PKN\n7. Seni Budaya\n8. Penjaskes" << endl;
+    cout << "Pilih nomor:\n> ";
+    cin >> subjectNum;
+    if (subjectNum == 0 || subjectNum > 8) {
+        cout << "Pilihan mata pelajaran tidak valid." << endl;
+        return;
+    }
+    cout << "Masukkan Nama/Deskripsi Tugas:\n> ";
     getline(cin >> ws, description);
     cout << "Tanggal tenggat Tugas (format: dd-mm-yy):\n> ";
     cin >> dueDate;
@@ -962,7 +1022,8 @@ void addAssignment() {
 
     if (selectedClass == nullptr || selectedClass == NULL) return;
 
-    ASSIGNMENT_DATA[a].initialize(id, description, dueDate);
+    ASSIGNMENT_DATA[a].initialize(id, subjectNum, description, dueDate);
+    ASSIGNMENT_DATA[a].setSubject();
     ASSIGNMENT_DATA[a].setClass(selectedClass);
     
     // Tambahkan assignment ke vektor assignments pada selectedClass
@@ -987,7 +1048,7 @@ Class* chooseClass() {
     }
 
     int pilihanKelas;
-    cout << "-> "; cin >> pilihanKelas;
+    cout << "> "; cin >> pilihanKelas;
 
     if (pilihanKelas < 1 || pilihanKelas > foundTeacher->numClasses) {
         cout << "Pilihan tidak valid." << endl;
@@ -998,6 +1059,7 @@ Class* chooseClass() {
 }
 
 void removeClassFromTeacher(Teacher* foundTeacher, Class* classToRemove) {
+    classToRemove->deleteForum();
     foundTeacher->removeClass(classToRemove); // Panggil metode removeClass pada objek teacherPtr   
 }
 
@@ -1067,7 +1129,7 @@ void seeDiscussionForum(bool isTeacher) {
 
         do {
             system("CLEAR");
-            cout << "\t> DISKUSI FORUM KELAS " << selectedClass->name << " <" << endl<< endl;
+            cout << "\t> FORUM DISKUSI KELAS " << selectedClass->name << " <" << endl<< endl;
             if (selectedClass->discussionForum.empty()) {
                 cout << "Forum kosong." << endl;
             }
@@ -1094,7 +1156,7 @@ void seeDiscussionForum(bool isTeacher) {
         }
         do {
             system("CLEAR");
-            cout << "\t== DISKUSI FORUM KELAS " << foundStudent->classPtr->name << " ==" << endl<< endl;
+            cout << "\t== FORUM DISKUSI KELAS " << foundStudent->classPtr->name << " ==" << endl<< endl;
 
             if (foundStudent->classPtr->discussionForum.empty()) {
                 cout << "Forum kosong." << endl;
@@ -1112,5 +1174,45 @@ void seeDiscussionForum(bool isTeacher) {
                 foundStudent->classPtr->addMessage(&newChat);    
             }        
         } while (messageContent != ".exit");
+    }
+}
+
+void setNilaiToSubject(Student* foundStudent, Assignment* assignment, float nilai) {
+
+    switch (assignment->subjectId) {
+    case 0: {
+        foundStudent->nilaiPtr->setNilai(BAHASA_INDONESIA, nilai);
+        break;
+    }
+    case 1: {
+        foundStudent->nilaiPtr->setNilai(BAHASA_INGGRIS, nilai);
+        break;
+    }
+    case 2: {
+        foundStudent->nilaiPtr->setNilai(MATEMATIKA, nilai);
+        break;
+    }
+    case 3: {
+        foundStudent->nilaiPtr->setNilai(IPA, nilai);
+        break;
+    }
+    case 4: {
+        foundStudent->nilaiPtr->setNilai(IPS, nilai);
+        break;
+    }
+    case 5: {
+        foundStudent->nilaiPtr->setNilai(PKN, nilai);
+        break;
+    }
+    case 6: {
+        foundStudent->nilaiPtr->setNilai(SENI_BUDAYA, nilai);
+        break;
+    }
+    case 7: {
+        foundStudent->nilaiPtr->setNilai(PENJASKES, nilai);
+        break;
+    }
+    default:
+        break;
     }
 }
