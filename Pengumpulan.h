@@ -4,7 +4,6 @@
 
 #include <string>
 #include <ctime>
-#include "Assignment.h"
 
 using namespace std;
 
