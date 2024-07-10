@@ -22,7 +22,7 @@ struct Assignment {
 
     void initialize(string id, int subjectNum, string description, string dueDate) {
         this->id = id;
-        this->subjectId = subjectNum - 1;
+        this->subjectId = subjectNum;
         this->description = description;
         this->dueDate = dueDate;
         this->classPtr = nullptr;
@@ -38,12 +38,15 @@ struct Assignment {
     }
 
     void display() {
-        cout << "Assignment ID: " << id << endl;
-        cout << "Mata Pelajaran: " << subject << endl;
-        cout << "Deskripsi: " << description << endl;
-        cout << "Tanggal Tenggat: " << dueDate << endl;
+        cout << "+----------------------------+" << endl;
+        cout << "> Assignment ID: " << id << endl;
+        cout << "> Mata Pelajaran: " << subject << endl;
+        cout << "> Deskripsi: " << description << endl;
+        cout << "> Tanggal Tenggat: " << dueDate << endl;
         // cout << "Class: " << classPtr->name << endl;
+        cout << "+----------------------------+" << endl;
         cout << endl;
+
     }
 };
 

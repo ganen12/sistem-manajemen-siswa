@@ -16,7 +16,7 @@ struct Queue {
     void clear();
     bool isEmpty();
     bool isFull();
-    void print();
+    void print(Teacher* currentTeacher);
 
     Pengumpulan* peek() const { // Fungsi untuk melihat elemen terdepan tanpa menghapus
         if (belakang == -1) {

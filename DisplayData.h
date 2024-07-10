@@ -97,36 +97,51 @@ void displayClassesData(const Class CLASSES_DATA[], int& counter, const LoggedIn
         }
 
         cout << garis_verti << cls.id << setw(9 - cls.id.length()); 
-        cout << garis_verti << cls.name << setw(27 - cls.name.length()) << garis_verti;
+        cout << garis_verti << cls.fullClassName() << setw(27 - cls.fullClassName().length()) << garis_verti;
 
         // Tampilkan nama guru jika ada
         if (cls.teacher) {
             cout << cls.teacher->username;
+            cout << setw(20 - cls.teacher->username.length()) << garis_verti;
         } else {
             cout << "-"; // atau "NULL"
+            cout << setw(19) << garis_verti;
         }
-        cout << setw(20 - cls.teacher->username.length()) << garis_verti;
+
         
         // Tampilkan jumlah siswa
-        cout << cls.numStudents;
-        if(cls.numStudents < 10){
+        if (cls.numStudents) {
+            cout << cls.numStudents;
+            if(cls.numStudents < 10){
+                cout << setw(18);
+            }
+            else{
+                cout << setw(17);
+            }
+        } else {
+            cout << "-"; // atau "0"
             cout << setw(18);
         }
-        else{
-            cout << setw(17);
-        }
+
         cout << garis_verti;
 
         // Tampilkan jumlah tugas
-        cout << cls.assignments.size();
-        if(cls.assignments.size() < 10){
+        if (!cls.assignments.empty()) {
+            cout << cls.assignments.size();
+            if(cls.assignments.size() < 10){
+                cout << setw(18);
+            }
+            else{
+                cout << setw(17);
+            }
+            cout << garis_verti;
+            cout << endl;
+        } else {
+            cout << "-"; // atau "0"
             cout << setw(18);
+            cout << garis_verti;
+            cout << endl;
         }
-        else{
-            cout << setw(17);
-        }
-        cout << garis_verti;
-        cout << endl;
     }   
 
     cout << sudut_kiri_bawah;
@@ -243,8 +258,17 @@ void displayStudentsData(const Student STUDENTS_DATA[], int& counter, const Logg
         Student& student = tempStudents[i];
 
         // Filter siswa berdasarkan kelas jika showAll = false (hanya jika loggedIn adalah guru)
-        if (!showAll && loggedIn.isTeacher && (student.classPtr == nullptr || student.classPtr->teacher != loggedIn.teacherPtr)) {
-            continue;
+        if (!showAll && loggedIn.isTeacher) {
+            bool isStudentInTeacherClass = false;
+            for (int j = 0; j < student.numClasses; j++) { 
+                if (student.enrolledClasses[j]->teacher == loggedIn.teacherPtr) {
+                    isStudentInTeacherClass = true;
+                    break; // Keluar dari loop jika siswa ditemukan di kelas guru
+                }
+            }
+            if (!isStudentInTeacherClass) {
+                continue; // Lanjutkan ke siswa berikutnya jika tidak ditemukan di kelas guru
+            }
         }
 
         cout << garis_verti << student.id << setw(9 - student.id.length()) << garis_verti << student.username << setw(23 - student.username.length()) << garis_verti;
@@ -270,13 +294,13 @@ void displayStudentsData(const Student STUDENTS_DATA[], int& counter, const Logg
         cout << garis_verti << student.email << setw(35 - student.email.length()) << garis_verti;
 
         // Tampilkan nama kelas jika siswa sudah terdaftar di kelas
-        if (student.classPtr) {
-            cout << student.classPtr->name << setw(24 - student.classPtr->name.length()) << garis_verti;
+        if (student.numClasses > 0 && student.numClasses) {
+            cout << student.numClasses << setw(24 - student.username.length()) << garis_verti;
         } else {
             cout << "-" << setw(23) << garis_verti; // atau "NULL"
         }
         
-        // Tampilkan nilai siswa
+        // TODO: Tampilkan nilai siswa berdasarkan mapelnya
         cout << student.nilaiPtr->getSumOfNilai();
         if(student.nilaiPtr->getSumOfNilai() < 10){
             cout << setw(21);

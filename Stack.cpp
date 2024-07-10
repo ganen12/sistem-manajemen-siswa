@@ -61,6 +61,4 @@ void Stack::printHistory(bool isTeacher) {
             }
         }
     }
-
-    
 }
